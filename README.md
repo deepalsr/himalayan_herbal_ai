@@ -41,6 +41,14 @@ himalayan-herbal-ai/
 │   │   └── evaluate.py                 # Evaluation utilities
 │   ├── ranking/                # Candidate ranking
 │   └── utils/                  # Configuration & helpers
+├── web/
+│   ├── backend/
+│   │   ├── app.py              # Flask REST server
+│   │   ├── requirements.txt    # Python dependencies
+│   │   └── .env.example        # Configuration template
+│   ├── frontend/
+│   │   └── index.html          # Web UI (HTML5/CSS/JS)
+│   └── README.md               # Web documentation
 ├── data/                       # Data storage
 │   ├── processed/              # Processed datasets
 │   └── raw/                    # Raw data
@@ -196,7 +204,151 @@ curl -X POST http://localhost:8000/batch-predict \
 
 ---
 
-## 📊 Model Architectures
+## � Web Interface
+
+A modern, user-friendly web application for interacting with the AI models without coding:
+
+### Start the Web Backend
+
+```bash
+cd web/backend
+export FLASK_PORT=8081
+pip install -r requirements.txt
+python app.py
+```
+
+Backend runs at `http://localhost:8081/api`
+
+### Features
+
+**Single Predictions**
+- Input SMILES string and compound name
+- Get bioactivity score, toxicity assessment, drug-likeness
+- Receive AI-generated recommendations
+
+**Batch Processing**
+- Upload/paste multiple SMILES strings
+- Process up to 1000 compounds in one request
+- Download results as table
+
+**Dataset Explorer**
+- Browse all 34 curated compounds
+- Filter by bioactivity status
+- View plant sources and molecular properties
+- Export filtered results
+
+**Prediction History**
+- Automatic tracking of all predictions
+- View past results and timestamps
+- Compare multiple compounds
+- Clear history as needed
+
+**Real-time Monitoring**
+- Live API connectivity status
+- Model availability indicators
+- System health dashboard
+
+### Web Architecture
+
+```
+Browser (http://localhost:8081)
+         ↓
+Frontend (HTML5/CSS/JavaScript)
+         ↓
+Backend (Flask REST API)
+         ↓
+Main API (http://localhost:8000)
+    ├─ Bioactivity Model
+    ├─ Toxicity Model
+    └─ 34 Compounds Dataset
+```
+
+### Technologies
+
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript (no dependencies)
+- **Backend:** Flask 2.3.3, Python 3.13
+- **Server:** Gunicorn (production), Flask dev server (development)
+- **Communication:** HTTP/REST JSON
+
+### Quick Start
+
+```bash
+# 1. Ensure main API is running
+curl http://localhost:8000/health
+
+# 2. Start web backend
+cd web/backend
+export FLASK_PORT=8081
+python app.py
+
+# 3. Open browser
+# http://localhost:8081
+```
+
+### Backend Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Home page |
+| `/api/health` | GET | Backend health check |
+| `/api/predict` | POST | Single prediction |
+| `/api/batch-predict` | POST | Batch predictions |
+| `/api/dataset` | GET | Dataset statistics |
+| `/api/compounds` | GET | List all compounds |
+| `/api/models/status` | GET | Model status |
+| `/api/history` | GET/POST | Prediction history |
+
+### Configuration
+
+Environment variables (`.env` file):
+
+```bash
+FLASK_PORT=8081                    # Web server port
+API_BASE_URL=http://localhost:8000 # Main API URL
+DEBUG=False                        # Production mode
+SECRET_KEY=your-secret-key         # Session encryption
+API_TIMEOUT=30                     # API request timeout (seconds)
+```
+
+### Production Deployment
+
+**With Gunicorn:**
+```bash
+gunicorn -w 4 -b 0.0.0.0:8081 web.backend.app:app
+```
+
+**With Docker:**
+```bash
+docker build -t himalayan-web .
+docker run -p 8081:8081 himalayan-web
+```
+
+**With Nginx (reverse proxy):**
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+    
+    location / {
+        proxy_pass http://localhost:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+### Documentation
+
+Comprehensive guides in `web/` directory:
+- **START_HERE.md** - Quick start guide
+- **WEB_INTERFACE_SETUP.md** - Detailed setup instructions
+- **WEB_INTERFACE_VERIFICATION.md** - Testing checklist
+- **WEB_SUMMARY.md** - Features overview
+- **web/README.md** - API documentation
+
+---
+
+## �📊 Model Architectures
 
 ### Bioactivity Model
 - **Type:** Multi-layer perceptron (MLP)
@@ -384,7 +536,16 @@ A: Yes! The API is production-ready. Use Docker/Kubernetes for scaling.
 **Q: What accuracy should I expect?**
 A: With synthetic data, ~85% F1-score. Real experimental data typically improves this.
 
+**Q: How do I access the web interface?**
+A: Start the Flask backend with `python web/backend/app.py` then open http://localhost:8081 in your browser. See `web/README.md` for details.
+
+**Q: Does the web interface require the main API?**
+A: Yes, the Flask backend proxies requests to the main FastAPI server on port 8000. Both must be running.
+
+**Q: Can I use batch predictions via the web interface?**
+A: Yes! The web UI supports batch processing up to 1000 compounds. Just paste multiple SMILES strings.
+
 ---
 
 **Created:** May 2026  
-**Status:** Complete & Ready for Use 🚀
+**Status:** Complete with Web UI 🚀
