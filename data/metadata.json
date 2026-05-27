@@ -1,0 +1,39 @@
+{
+  "collection_date": "2026-05-27T11:59:57.810759",
+  "total_compounds": 34,
+  "active_compounds": 28,
+  "plant_sources": [
+    "Azadirachta indica",
+    "Curcuma longa",
+    "Zingiber officinale",
+    "Berberis aristata",
+    "Tinospora cordifolia",
+    "Terminalia chebula",
+    "Phyllanthus emblica",
+    "Ocimum sanctum",
+    "Withania somnifera",
+    "Swertia chirayita",
+    "Thymus linearis",
+    "Juniperus communis",
+    "Various"
+  ],
+  "data_source": "Hybrid: Built-in dataset + PubChem",
+  "features": [
+    "compound_name",
+    "smiles",
+    "plant_source",
+    "molecular_weight",
+    "antimicrobial_active",
+    "logp",
+    "tpsa",
+    "hbd",
+    "hba",
+    "rotatable_bonds",
+    "aromatic_rings",
+    "lipinski_mw",
+    "lipinski_logp",
+    "lipinski_hbd",
+    "lipinski_hba",
+    "lipinski_violations"
+  ]
+}
