@@ -1,900 +1,580 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Himalayan Herbal AI - Antimicrobial Compound Predictor</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Himalayan Herbal AI - VedaAI</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#051a0f",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#1a2f23",
+                        "on-primary-container": "#809787",
+                        "secondary": "#00696e",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#00f4fe",
+                        "on-secondary-container": "#006c71",
+                        "secondary-fixed": "#63f7ff",
+                        "secondary-fixed-dim": "#00dce5",
+                        "surface": "#f8faf9",
+                        "on-surface": "#191c1c",
+                        "surface-variant": "#e1e3e2",
+                        "on-surface-variant": "#424843",
+                        "background": "#f8faf9",
+                        "on-background": "#191c1c",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                    },
+                    spacing: {
+                        "section-gap": "80px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "16px",
+                    },
+                    fontFamily: {
+                        "display": ["Playfair Display"],
+                        "body": ["JetBrains Mono"],
+                    },
+                },
+            },
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+        .ai-glow {
+            box-shadow: 0 0 20px rgba(0, 244, 254, 0.15);
+            border: 1px solid rgba(0, 244, 254, 0.3);
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-
-        header {
-            text-align: center;
-            color: white;
-            margin-bottom: 40px;
-        }
-
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .status-bar {
-            background: white;
-            border-radius: 10px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .status-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        .status-indicator.connected {
-            background-color: #22c55e;
-        }
-
-        .status-indicator.disconnected {
-            background-color: #ef4444;
-            animation: none;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .card h2 {
-            margin-bottom: 20px;
-            color: #333;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 500;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
-        }
-
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button.secondary {
-            background: #e0e7ff;
-            color: #667eea;
-            margin-left: 10px;
-        }
-
-        button.secondary:hover {
-            background: #c7d2fe;
-        }
-
-        .result-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-left: 4px solid #667eea;
-            border-radius: 5px;
-            margin: 15px 0;
-        }
-
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .result-item:last-child {
-            border-bottom: none;
-        }
-
-        .result-label {
-            font-weight: 600;
-            color: #555;
-        }
-
-        .result-value {
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        .recommendation {
-            padding: 12px;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .recommendation.high-risk {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .recommendation.medium-risk {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .recommendation.low-risk {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .dataset-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9em;
-        }
-
-        .dataset-table th {
-            background: #667eea;
-            color: white;
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .dataset-table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .dataset-table tbody tr:hover {
-            background: #f8f9fa;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #ddd;
-        }
-
-        .tab-button {
-            background: none;
-            border: none;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #999;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .tab-button.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-            background: #f8f9fa;
-        }
-
-        .tab-button:hover {
-            color: #667eea;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .loading.show {
-            display: block;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 12px;
-            border-radius: 5px;
-            margin: 15px 0;
-            display: none;
-        }
-
-        .error.show {
-            display: block;
-        }
-
-        .success {
-            background: #dcfce7;
-            color: #166534;
-            padding: 12px;
-            border-radius: 5px;
-            margin: 15px 0;
-            display: none;
-        }
-
-        .success.show {
-            display: block;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 15px 0;
-        }
-
-        .stat-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.8em;
-            font-weight: 700;
-        }
-
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        .batch-input {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .pagination {
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .pagination button {
-            padding: 8px 12px;
-            min-width: 40px;
-        }
-
-        .pagination button.active {
-            background: #667eea;
-        }
-
-        @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
-
-            header h1 {
-                font-size: 1.8em;
-            }
-
-            .stats {
-                grid-template-columns: 1fr;
-            }
-
-            .dataset-table {
-                font-size: 0.8em;
-            }
-
-            .dataset-table th, .dataset-table td {
-                padding: 8px;
-            }
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d0e9d6; border-radius: 10px; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>🌿 Himalayan Herbal AI</h1>
-            <p>AI-Powered Discovery of Antimicrobial Herbal Compounds</p>
-        </header>
-
-        <div class="status-bar">
-            <div class="status-item">
-                <div class="status-indicator disconnected" id="statusIndicator"></div>
-                <span id="statusText">Connecting...</span>
+<body class="bg-background text-on-background font-body min-h-screen">
+<!-- Navigation Bar -->
+<header class="fixed top-0 right-0 left-0 z-30 bg-surface/80 backdrop-blur-xl border-b border-surface-variant/20">
+    <div class="flex justify-between items-center w-full px-8 py-4 max-w-full mx-auto">
+        <div class="flex items-center gap-8">
+            <div class="font-display text-2xl font-bold text-primary">🌿 VedaAI</div>
+            <nav class="hidden lg:flex gap-6">
+                <a class="text-sm text-on-surface-variant hover:text-secondary transition-colors" href="#predict">Predict</a>
+                <a class="text-sm text-on-surface-variant hover:text-secondary transition-colors" href="#batch">Batch</a>
+                <a class="text-sm text-on-surface-variant hover:text-secondary transition-colors" href="#explorer">Compounds</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="relative hidden sm:block">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="search">search</span>
+                <input class="pl-10 pr-4 py-2 bg-surface-variant/20 border border-surface-variant rounded-full text-sm focus:ring-1 focus:ring-secondary w-48 transition-all" placeholder="Search compounds..." type="text"/>
             </div>
-            <div class="status-item" id="modelsStatus">
-                <span>Models: Loading...</span>
+            <div class="flex items-center gap-2 px-3 py-1 bg-secondary-container/10 rounded-full">
+                <div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+                <span class="text-xs font-mono text-secondary" id="statusText">Connecting...</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="pt-24 min-h-screen">
+    <div class="px-8 py-8 max-w-7xl mx-auto">
+        <!-- Hero Section -->
+        <div class="mb-section-gap">
+            <div class="glass p-12 rounded-2xl shadow-lg">
+                <h1 class="font-display text-5xl font-bold text-primary mb-4">Antimicrobial Compound Predictor</h1>
+                <p class="text-lg text-on-surface-variant max-w-2xl">Discover bioactive compounds from Himalayan medicinal plants using AI-powered molecular analysis. Predict bioactivity and toxicity instantly.</p>
             </div>
         </div>
 
-        <div class="content">
-            <!-- Prediction Card -->
-            <div class="card">
-                <h2>🧪 Single Compound Prediction</h2>
-                
-                <div class="form-group">
-                    <label for="smiles">SMILES String</label>
-                    <textarea id="smiles" placeholder="E.g., CC(=O)Cc1ccc(O)c(O)cc1"></textarea>
+        <!-- Prediction Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-section-gap" id="predict">
+            <!-- Single Prediction (Left 8 Cols) -->
+            <div class="lg:col-span-8 space-y-gutter">
+                <div class="glass p-8 rounded-xl shadow-lg">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="material-symbols-outlined text-secondary" data-icon="experiment">experiment</span>
+                        <h2 class="font-display text-2xl font-semibold text-primary">Single Compound Analysis</h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-on-surface mb-2">SMILES String</label>
+                            <textarea id="smiles" class="w-full p-3 bg-surface-variant/5 border border-surface-variant rounded-lg font-mono text-sm focus:ring-1 focus:ring-secondary focus:border-transparent transition-all" placeholder="E.g., CC(=O)Cc1ccc(O)c(O)cc1" rows="3"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-on-surface mb-2">Compound Name (Optional)</label>
+                                <input type="text" id="compoundName" class="w-full p-3 bg-surface-variant/5 border border-surface-variant rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-transparent transition-all" placeholder="E.g., Aspirin analog">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-on-surface mb-2">Plant Source (Optional)</label>
+                                <input type="text" id="plantSource" class="w-full p-3 bg-surface-variant/5 border border-surface-variant rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-transparent transition-all" placeholder="E.g., Himalayan plants">
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button onclick="predictSingle()" class="px-6 py-2 bg-primary text-on-primary font-semibold rounded-lg hover:shadow-lg transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm" data-icon="play_arrow">play_arrow</span>
+                                Analyze
+                            </button>
+                            <button onclick="clearPredictionForm()" class="px-6 py-2 bg-surface-variant/20 text-primary font-semibold rounded-lg hover:bg-surface-variant/40 transition-all">
+                                Clear
+                            </button>
+                        </div>
+
+                        <div class="error hidden p-3 bg-red-50 text-red-700 rounded-lg text-sm" id="predictionError"></div>
+                        <div class="success hidden p-3 bg-green-50 text-green-700 rounded-lg text-sm" id="predictionSuccess"></div>
+                        <div class="loading hidden" id="predictionLoading">
+                            <div class="flex items-center justify-center gap-3 py-4">
+                                <div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
+                                <p class="text-sm text-on-surface-variant">Analyzing compound...</p>
+                            </div>
+                        </div>
+                        <div id="predictionResult"></div>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="compoundName">Compound Name (Optional)</label>
-                    <input type="text" id="compoundName" placeholder="E.g., Aspirin analog">
-                </div>
-
-                <div class="form-group">
-                    <label for="plantSource">Plant Source (Optional)</label>
-                    <input type="text" id="plantSource" placeholder="E.g., Himalayan plants">
-                </div>
-
-                <button onclick="predictSingle()">Predict</button>
-                <button class="secondary" onclick="clearPredictionForm()">Clear</button>
-
-                <div class="error" id="predictionError"></div>
-                <div class="success" id="predictionSuccess"></div>
-                <div class="loading" id="predictionLoading">
-                    <div class="spinner"></div>
-                    <p>Making prediction...</p>
-                </div>
-
-                <div id="predictionResult"></div>
             </div>
 
-            <!-- Dataset Info Card -->
-            <div class="card">
-                <h2>📊 Dataset Information</h2>
-                <div id="datasetStats"></div>
-                <button onclick="loadDataset()">Load Dataset</button>
+            <!-- Dataset Stats (Right 4 Cols) -->
+            <div class="lg:col-span-4 space-y-gutter">
+                <div class="glass ai-glow p-8 rounded-xl shadow-lg h-fit">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="material-symbols-outlined text-secondary" data-icon="database">database</span>
+                        <h3 class="font-display text-xl font-semibold text-primary">Dataset</h3>
+                    </div>
+                    <div id="datasetStats">
+                        <div class="space-y-4">
+                            <div class="p-4 bg-primary/5 rounded-lg border-l-4 border-primary">
+                                <div class="text-2xl font-bold text-primary">-</div>
+                                <div class="text-xs text-on-surface-variant">Total Compounds</div>
+                            </div>
+                            <div class="p-4 bg-secondary/5 rounded-lg border-l-4 border-secondary">
+                                <div class="text-2xl font-bold text-secondary">-</div>
+                                <div class="text-xs text-on-surface-variant">Active Compounds</div>
+                            </div>
+                            <div class="p-4 bg-primary-container/20 rounded-lg border-l-4 border-primary-container">
+                                <div class="text-2xl font-bold text-primary">-</div>
+                                <div class="text-xs text-on-surface-variant">Plant Sources</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="loadDataset()" class="w-full mt-6 px-4 py-2 bg-secondary text-on-secondary font-semibold rounded-lg hover:shadow-lg transition-all text-sm">Load Stats</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Batch Prediction Section -->
+        <div class="glass p-8 rounded-xl shadow-lg mb-section-gap" id="batch">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="material-symbols-outlined text-secondary" data-icon="send">send</span>
+                <h2 class="font-display text-2xl font-semibold text-primary">Batch Processing</h2>
+                <span class="px-3 py-1 bg-secondary-container/20 text-secondary rounded-full text-xs font-semibold">Up to 1000</span>
             </div>
 
-            <!-- Batch Prediction Card -->
-            <div class="card full-width">
-                <h2>⚡ Batch Predictions</h2>
-                
-                <div class="batch-input">
-                    <label>Enter Multiple SMILES (one per line)</label>
-                    <textarea id="batchSmiles" placeholder="CC(=O)Cc1ccc(O)c(O)cc1
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-on-surface mb-2">Enter Multiple SMILES (one per line)</label>
+                    <textarea id="batchSmiles" class="w-full p-3 bg-surface-variant/5 border border-surface-variant rounded-lg font-mono text-sm focus:ring-1 focus:ring-secondary focus:border-transparent transition-all" placeholder="CC(=O)Cc1ccc(O)c(O)cc1
 c1ccc(O)c(O)c1
-CC(C)Cc1ccc(cc1)C(C)C(O)=O"></textarea>
+CC(C)Cc1ccc(cc1)C(C)C(O)=O" rows="6"></textarea>
                 </div>
 
-                <button onclick="predictBatch()">Batch Predict</button>
-                <button class="secondary" onclick="clearBatchForm()">Clear</button>
-
-                <div class="error" id="batchError"></div>
-                <div class="loading" id="batchLoading">
-                    <div class="spinner"></div>
-                    <p>Processing batch predictions...</p>
+                <div class="flex gap-3">
+                    <button onclick="predictBatch()" class="px-6 py-2 bg-primary text-on-primary font-semibold rounded-lg hover:shadow-lg transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm" data-icon="play_arrow">play_arrow</span>
+                        Process Batch
+                    </button>
+                    <button onclick="clearBatchForm()" class="px-6 py-2 bg-surface-variant/20 text-primary font-semibold rounded-lg hover:bg-surface-variant/40 transition-all">
+                        Clear
+                    </button>
                 </div>
 
+                <div class="error hidden p-3 bg-red-50 text-red-700 rounded-lg text-sm" id="batchError"></div>
+                <div class="loading hidden" id="batchLoading">
+                    <div class="flex items-center justify-center gap-3 py-4">
+                        <div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
+                        <p class="text-sm text-on-surface-variant">Processing batch predictions...</p>
+                    </div>
+                </div>
                 <div id="batchResult"></div>
             </div>
+        </div>
 
-            <!-- Dataset Explorer Card -->
-            <div class="card full-width">
-                <h2>🔍 Dataset Explorer</h2>
+        <!-- Dataset Explorer -->
+        <div class="glass p-8 rounded-xl shadow-lg" id="explorer">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="material-symbols-outlined text-secondary" data-icon="explore">explore</span>
+                <h2 class="font-display text-2xl font-semibold text-primary">Compound Database</h2>
+            </div>
 
-                <div class="tabs">
-                    <button class="tab-button active" onclick="switchTab(event, 'compounds')">All Compounds</button>
-                    <button class="tab-button" onclick="switchTab(event, 'active')">Active Only</button>
-                    <button class="tab-button" onclick="switchTab(event, 'history')">Prediction History</button>
-                </div>
+            <div class="flex gap-2 mb-6 border-b border-surface-variant/30">
+                <button class="tab-button active px-4 py-3 font-semibold text-sm text-primary border-b-2 border-primary transition-all" onclick="switchTab(event, 'compounds')">
+                    All Compounds
+                </button>
+                <button class="tab-button px-4 py-3 font-semibold text-sm text-on-surface-variant hover:text-primary transition-all" onclick="switchTab(event, 'active')">
+                    Active Only
+                </button>
+                <button class="tab-button px-4 py-3 font-semibold text-sm text-on-surface-variant hover:text-primary transition-all" onclick="switchTab(event, 'history')">
+                    Prediction History
+                </button>
+            </div>
 
-                <div id="compounds" class="tab-content active">
-                    <div class="loading" id="compoundsLoading">
-                        <div class="spinner"></div>
-                        <p>Loading compounds...</p>
+            <!-- All Compounds Tab -->
+            <div id="compounds" class="tab-content active">
+                <div class="loading" id="compoundsLoading">
+                    <div class="flex items-center justify-center gap-3 py-8">
+                        <div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
+                        <p class="text-sm text-on-surface-variant">Loading compounds...</p>
                     </div>
-                    <table class="dataset-table" id="compoundsTable" style="display: none;">
+                </div>
+                <div class="overflow-x-auto hidden" id="compoundsTableWrapper">
+                    <table class="w-full text-sm">
                         <thead>
-                            <tr>
-                                <th>Compound</th>
-                                <th>Plant Source</th>
-                                <th>MW</th>
-                                <th>Active</th>
-                                <th>Action</th>
+                            <tr class="border-b border-surface-variant">
+                                <th class="text-left py-3 px-4 font-semibold text-on-surface">Compound</th>
+                                <th class="text-left py-3 px-4 font-semibold text-on-surface">Plant Source</th>
+                                <th class="text-center py-3 px-4 font-semibold text-on-surface">MW</th>
+                                <th class="text-center py-3 px-4 font-semibold text-on-surface">Active</th>
+                                <th class="text-center py-3 px-4 font-semibold text-on-surface">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="compoundsTableBody"></tbody>
+                        <tbody id="compoundsTableBody" class="divide-y divide-surface-variant/30"></tbody>
                     </table>
                 </div>
+            </div>
 
-                <div id="active" class="tab-content">
-                    <div class="loading" id="activeLoading">
-                        <div class="spinner"></div>
-                        <p>Loading active compounds...</p>
+            <!-- Active Compounds Tab -->
+            <div id="active" class="tab-content hidden">
+                <div class="loading" id="activeLoading">
+                    <div class="flex items-center justify-center gap-3 py-8">
+                        <div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
+                        <p class="text-sm text-on-surface-variant">Loading active compounds...</p>
                     </div>
-                    <table class="dataset-table" id="activeTable" style="display: none;">
+                </div>
+                <div class="overflow-x-auto hidden" id="activeTableWrapper">
+                    <table class="w-full text-sm">
                         <thead>
-                            <tr>
-                                <th>Compound</th>
-                                <th>Plant Source</th>
-                                <th>MW</th>
-                                <th>Action</th>
+                            <tr class="border-b border-surface-variant">
+                                <th class="text-left py-3 px-4 font-semibold text-on-surface">Compound</th>
+                                <th class="text-left py-3 px-4 font-semibold text-on-surface">Plant Source</th>
+                                <th class="text-center py-3 px-4 font-semibold text-on-surface">MW</th>
+                                <th class="text-center py-3 px-4 font-semibold text-on-surface">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="activeTableBody"></tbody>
+                        <tbody id="activeTableBody" class="divide-y divide-surface-variant/30"></tbody>
                     </table>
                 </div>
+            </div>
 
-                <div id="history" class="tab-content">
-                    <div id="historyContent">
-                        <p style="text-align: center; color: #999; padding: 20px;">No predictions yet</p>
-                    </div>
+            <!-- History Tab -->
+            <div id="history" class="tab-content hidden">
+                <div id="historyContent" class="text-center py-8 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-4xl mb-2 opacity-50">history</span>
+                    <p>No predictions yet</p>
                 </div>
             </div>
         </div>
     </div>
+</main>
 
-    <script>
-        const API_URL = '/api';
+<script>
+    const API_URL = '/api';
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            checkHealth();
-            setInterval(checkHealth, 30000); // Check every 30 seconds
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        checkHealth();
+        setInterval(checkHealth, 30000);
+    });
+
+    // Health check
+    async function checkHealth() {
+        try {
+            const response = await fetch(`${API_URL}/health`);
+            if (response.ok) {
+                document.getElementById('statusText').textContent = 'Connected';
+            } else {
+                document.getElementById('statusText').textContent = 'API Error';
+            }
+        } catch {
+            document.getElementById('statusText').textContent = 'Offline';
+        }
+    }
+
+    // Predict single
+    async function predictSingle() {
+        const smiles = document.getElementById('smiles').value.trim();
+        if (!smiles) {
+            showError('predictionError', 'SMILES string is required');
+            return;
+        }
+
+        const data = {
+            smiles: smiles,
+            compound_name: document.getElementById('compoundName').value || 'Unknown',
+            plant_source: document.getElementById('plantSource').value || 'Unknown'
+        };
+
+        showLoading('predictionLoading', true);
+        hideError('predictionError');
+
+        try {
+            const response = await fetch(`${API_URL}/predict`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) throw new Error('Prediction failed');
+            const result = await response.json();
+            displayPredictionResult(result);
+            showSuccess('predictionSuccess', 'Analysis successful!');
+        } catch (error) {
+            showError('predictionError', error.message);
+        } finally {
+            showLoading('predictionLoading', false);
+        }
+    }
+
+    // Display prediction result
+    function displayPredictionResult(result) {
+        const bioactivity = (result.bioactivity_prediction * 100).toFixed(1);
+        const toxicity = (result.toxicity_prediction * 100).toFixed(1);
+        
+        let riskColor = 'bg-green-50 border-l-4 border-green-500';
+        let riskLabel = '✅ Promising';
+        
+        if (toxicity > 70) {
+            riskColor = 'bg-red-50 border-l-4 border-red-500';
+            riskLabel = '⚠️ High Risk';
+        } else if (toxicity > 50) {
+            riskColor = 'bg-yellow-50 border-l-4 border-yellow-500';
+            riskLabel = '⚠️ Moderate Risk';
+        }
+
+        const html = `
+            <div class="${riskColor} p-4 rounded-lg mt-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-xs text-on-surface-variant">Bioactivity</div>
+                        <div class="text-2xl font-bold text-primary">${bioactivity}%</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-on-surface-variant">Toxicity</div>
+                        <div class="text-2xl font-bold text-error">${toxicity}%</div>
+                    </div>
+                </div>
+                <div class="mt-3 p-2 bg-white rounded text-center font-semibold text-primary">${riskLabel}</div>
+            </div>
+        `;
+        
+        document.getElementById('predictionResult').innerHTML = html;
+    }
+
+    // Batch predict
+    async function predictBatch() {
+        const batchText = document.getElementById('batchSmiles').value.trim();
+        if (!batchText) {
+            showError('batchError', 'Enter at least one SMILES string');
+            return;
+        }
+
+        const smiles = batchText.split('\n').filter(s => s.trim()).map(s => ({
+            smiles: s.trim()
+        }));
+
+        if (smiles.length > 1000) {
+            showError('batchError', 'Maximum 1000 compounds per batch');
+            return;
+        }
+
+        showLoading('batchLoading', true);
+        hideError('batchError');
+
+        try {
+            const response = await fetch(`${API_URL}/batch-predict`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(smiles)
+            });
+
+            if (!response.ok) throw new Error('Batch prediction failed');
+            const result = await response.json();
+            displayBatchResults(result.predictions);
+        } catch (error) {
+            showError('batchError', error.message);
+        } finally {
+            showLoading('batchLoading', false);
+        }
+    }
+
+    // Display batch results
+    function displayBatchResults(predictions) {
+        let html = '<div class="overflow-x-auto mt-4"><table class="w-full text-sm"><thead><tr class="border-b border-surface-variant"><th class="text-left py-3 px-4 font-semibold">Compound</th><th class="text-center py-3 px-4 font-semibold">Bioactivity</th><th class="text-center py-3 px-4 font-semibold">Toxicity</th><th class="text-center py-3 px-4 font-semibold">Status</th></tr></thead><tbody class="divide-y divide-surface-variant/30">';
+        
+        predictions.forEach(pred => {
+            const bioactivity = (pred.bioactivity_prediction * 100).toFixed(1);
+            const toxicity = (pred.toxicity_prediction * 100).toFixed(1);
+            const status = toxicity > 70 ? '⚠️ High' : toxicity > 50 ? '⚠️ Medium' : '✅ Good';
+            
+            html += `<tr><td class="py-3 px-4">${pred.compound_name || 'Compound'}</td><td class="text-center py-3 px-4">${bioactivity}%</td><td class="text-center py-3 px-4">${toxicity}%</td><td class="text-center py-3 px-4">${status}</td></tr>`;
         });
+        
+        html += '</tbody></table></div>';
+        document.getElementById('batchResult').innerHTML = html;
+    }
 
-        // Health check
-        async function checkHealth() {
-            try {
-                const response = await fetch(`${API_URL}/health`);
-                const data = await response.json();
-                
-                const indicator = document.getElementById('statusIndicator');
-                const statusText = document.getElementById('statusText');
-                
-                if (response.ok) {
-                    indicator.className = 'status-indicator connected';
-                    statusText.textContent = 'Connected ✓';
-                    updateModelsStatus();
-                } else {
-                    indicator.className = 'status-indicator disconnected';
-                    statusText.textContent = 'API Error';
-                }
-            } catch (error) {
-                document.getElementById('statusIndicator').className = 'status-indicator disconnected';
-                document.getElementById('statusText').textContent = 'Disconnected';
-            }
-        }
-
-        // Update models status
-        async function updateModelsStatus() {
-            try {
-                const response = await fetch(`${API_URL}/models/status`);
-                const data = await response.json();
-                
-                const bioactive = data.models.bioactivity.loaded ? '✓' : '✗';
-                const toxicity = data.models.toxicity.loaded ? '✓' : '✗';
-                
-                document.getElementById('modelsStatus').innerHTML = 
-                    `<span>Models: Bioactivity ${bioactive} | Toxicity ${toxicity}</span>`;
-            } catch (error) {
-                console.error('Failed to get model status:', error);
-            }
-        }
-
-        // Predict single
-        async function predictSingle() {
-            const smiles = document.getElementById('smiles').value.trim();
+    // Load dataset
+    async function loadDataset() {
+        try {
+            const response = await fetch(`${API_URL}/dataset`);
+            const data = await response.json();
             
-            if (!smiles) {
-                showError('predictionError', 'SMILES string is required');
-                return;
-            }
-
-            const data = {
-                smiles: smiles,
-                compound_name: document.getElementById('compoundName').value || 'Unknown',
-                plant_source: document.getElementById('plantSource').value || 'Unknown'
-            };
-
-            showLoading('predictionLoading', true);
-            hideError('predictionError');
-
-            try {
-                const response = await fetch(`${API_URL}/predict`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                if (!response.ok) throw new Error('Prediction failed');
-
-                const result = await response.json();
-                displayPredictionResult(result);
-                showSuccess('predictionSuccess', 'Prediction successful!');
-            } catch (error) {
-                showError('predictionError', error.message);
-            } finally {
-                showLoading('predictionLoading', false);
-            }
-        }
-
-        // Display prediction result
-        function displayPredictionResult(result) {
-            const bioactivity = (result.bioactivity_prediction * 100).toFixed(1);
-            const toxicity = (result.toxicity_prediction * 100).toFixed(1);
-            
-            let riskLevel = 'low-risk';
-            let recommendation = '✅ Potentially promising';
-            
-            if (toxicity > 70) {
-                riskLevel = 'high-risk';
-                recommendation = '⚠️ High toxicity risk';
-            } else if (toxicity > 50) {
-                riskLevel = 'medium-risk';
-                recommendation = '⚠️ Moderate toxicity risk';
-            }
-
-            const html = `
-                <div class="result-card">
-                    <div class="result-item">
-                        <span class="result-label">Compound:</span>
-                        <span class="result-value">${result.compound_name}</span>
+            const stats = `
+                <div class="space-y-4">
+                    <div class="p-4 bg-primary/5 rounded-lg border-l-4 border-primary">
+                        <div class="text-2xl font-bold text-primary">${data.total_compounds}</div>
+                        <div class="text-xs text-on-surface-variant">Total Compounds</div>
                     </div>
-                    <div class="result-item">
-                        <span class="result-label">Bioactivity:</span>
-                        <span class="result-value">${bioactivity}%</span>
+                    <div class="p-4 bg-secondary/5 rounded-lg border-l-4 border-secondary">
+                        <div class="text-2xl font-bold text-secondary">${data.active_compounds}</div>
+                        <div class="text-xs text-on-surface-variant">Active Compounds</div>
                     </div>
-                    <div class="result-item">
-                        <span class="result-label">Toxicity:</span>
-                        <span class="result-value">${toxicity}%</span>
+                    <div class="p-4 bg-primary-container/20 rounded-lg border-l-4 border-primary-container">
+                        <div class="text-2xl font-bold text-primary">${data.plant_sources}</div>
+                        <div class="text-xs text-on-surface-variant">Plant Sources</div>
                     </div>
-                    <div class="result-item">
-                        <span class="result-label">Drug-like:</span>
-                        <span class="result-value">${result.drug_like ? 'Yes ✓' : 'No ✗'}</span>
-                    </div>
-                    <div class="recommendation ${riskLevel}">${recommendation}</div>
                 </div>
             `;
             
-            document.getElementById('predictionResult').innerHTML = html;
+            document.getElementById('datasetStats').innerHTML = stats;
+            loadCompoundsTable(false);
+        } catch (error) {
+            console.error('Failed to load dataset:', error);
         }
+    }
 
-        // Batch predict
-        async function predictBatch() {
-            const batchText = document.getElementById('batchSmiles').value.trim();
+    // Load compounds table
+    async function loadCompoundsTable(activeOnly) {
+        const params = new URLSearchParams({ limit: 100, active_only: activeOnly });
+
+        try {
+            const response = await fetch(`${API_URL}/compounds?${params}`);
+            const data = await response.json();
             
-            if (!batchText) {
-                showError('batchError', 'Enter at least one SMILES string');
+            const loaderId = activeOnly ? 'activeLoading' : 'compoundsLoading';
+            const tableId = activeOnly ? 'activeTableBody' : 'compoundsTableBody';
+            const wrapperId = activeOnly ? 'activeTableWrapper' : 'compoundsTableWrapper';
+            
+            let html = '';
+            data.compounds.forEach(compound => {
+                const mw = compound.molecular_weight ? compound.molecular_weight.toFixed(1) : 'N/A';
+                const active = compound.antimicrobial_active ? '✓' : '✗';
+                
+                html += `<tr class="hover:bg-surface-variant/5"><td class="py-3 px-4">${compound.compound_name}</td><td class="py-3 px-4">${compound.plant_source}</td><td class="text-center py-3 px-4">${mw}</td><td class="text-center py-3 px-4">${activeOnly ? '' : active}</td><td class="text-center py-3 px-4"><button class="px-2 py-1 text-xs bg-secondary/10 text-secondary rounded hover:bg-secondary/20 transition-all" onclick="useSMILES('${compound.smiles}')">Use</button></td></tr>`;
+            });
+
+            document.getElementById(tableId).innerHTML = html;
+            document.getElementById(wrapperId).classList.remove('hidden');
+            document.getElementById(loaderId).classList.add('hidden');
+        } catch (error) {
+            console.error('Failed to load compounds:', error);
+        }
+    }
+
+    // Use SMILES
+    function useSMILES(smiles) {
+        document.getElementById('smiles').value = smiles;
+        document.getElementById('smiles').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Switch tab
+    function switchTab(event, tabName) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('border-b-2', 'border-primary', 'text-primary'));
+        
+        document.getElementById(tabName).classList.remove('hidden');
+        event.target.classList.add('border-b-2', 'border-primary', 'text-primary');
+
+        if (tabName === 'compounds') loadCompoundsTable(false);
+        else if (tabName === 'active') loadCompoundsTable(true);
+        else if (tabName === 'history') loadHistory();
+    }
+
+    // Load history
+    async function loadHistory() {
+        try {
+            const response = await fetch(`${API_URL}/history`);
+            const data = await response.json();
+
+            if (data.count === 0) {
+                document.getElementById('historyContent').innerHTML = '<p class="text-on-surface-variant">No predictions yet</p>';
                 return;
             }
 
-            const smiles = batchText.split('\n').filter(s => s.trim()).map(s => ({
-                smiles: s.trim(),
-                compound_name: `Compound ${s.substring(0, 20)}...`
-            }));
-
-            if (smiles.length > 1000) {
-                showError('batchError', 'Maximum 1000 compounds per batch');
-                return;
-            }
-
-            showLoading('batchLoading', true);
-            hideError('batchError');
-
-            try {
-                const response = await fetch(`${API_URL}/batch-predict`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(smiles)
-                });
-
-                if (!response.ok) throw new Error('Batch prediction failed');
-
-                const result = await response.json();
-                displayBatchResults(result.predictions);
-            } catch (error) {
-                showError('batchError', error.message);
-            } finally {
-                showLoading('batchLoading', false);
-            }
-        }
-
-        // Display batch results
-        function displayBatchResults(predictions) {
-            let html = '<table class="dataset-table"><thead><tr><th>Compound</th><th>Bioactivity</th><th>Toxicity</th><th>Status</th></tr></thead><tbody>';
-            
-            predictions.forEach(pred => {
+            let html = '';
+            data.predictions.forEach(item => {
+                const pred = item.prediction;
                 const bioactivity = (pred.bioactivity_prediction * 100).toFixed(1);
                 const toxicity = (pred.toxicity_prediction * 100).toFixed(1);
-                const status = toxicity > 70 ? '⚠️ High Risk' : toxicity > 50 ? '⚠️ Medium' : '✅ Good';
                 
-                html += `<tr>
-                    <td>${pred.compound_name}</td>
-                    <td>${bioactivity}%</td>
-                    <td>${toxicity}%</td>
-                    <td>${status}</td>
-                </tr>`;
-            });
-            
-            html += '</tbody></table>';
-            document.getElementById('batchResult').innerHTML = html;
-        }
-
-        // Load dataset
-        async function loadDataset() {
-            document.getElementById('compoundsLoading').classList.add('show');
-            
-            try {
-                const response = await fetch(`${API_URL}/dataset`);
-                const data = await response.json();
-                
-                const stats = `
-                    <div class="stats">
-                        <div class="stat-box">
-                            <div class="stat-value">${data.total_compounds}</div>
-                            <div class="stat-label">Total Compounds</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">${data.active_compounds}</div>
-                            <div class="stat-label">Active Compounds</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">${data.plant_sources}</div>
-                            <div class="stat-label">Plant Sources</div>
-                        </div>
-                    </div>
-                `;
-                
-                document.getElementById('datasetStats').innerHTML = stats;
-                
-                // Load compounds table
-                loadCompoundsTable(false);
-            } catch (error) {
-                console.error('Failed to load dataset:', error);
-            }
-        }
-
-        // Load compounds table
-        async function loadCompoundsTable(activeOnly) {
-            const params = new URLSearchParams({
-                limit: 100,
-                active_only: activeOnly
+                html += `<div class="p-4 bg-surface-variant/5 rounded-lg mb-2"><div class="flex justify-between"><div><div class="font-semibold text-primary">${pred.compound_name}</div><div class="text-xs text-on-surface-variant">Bioactivity: ${bioactivity}% | Toxicity: ${toxicity}%</div></div></div></div>`;
             });
 
-            try {
-                const response = await fetch(`${API_URL}/compounds?${params}`);
-                const data = await response.json();
-                
-                const tableId = activeOnly ? 'activeTableBody' : 'compoundsTableBody';
-                const table = document.getElementById(activeOnly ? 'activeTable' : 'compoundsTable');
-                let html = '';
-
-                data.compounds.forEach(compound => {
-                    const mw = compound.molecular_weight ? compound.molecular_weight.toFixed(1) : 'N/A';
-                    const active = compound.antimicrobial_active ? '✓ Active' : '✗ Inactive';
-                    const smiles = compound.smiles;
-                    
-                    html += `<tr>
-                        <td>${compound.compound_name}</td>
-                        <td>${compound.plant_source}</td>
-                        <td>${mw}</td>
-                        <td>${activeOnly ? '' : active}</td>
-                        <td><button class="secondary" onclick="useSMILES('${smiles}')">Use</button></td>
-                    </tr>`;
-                });
-
-                document.getElementById(tableId).innerHTML = html;
-                table.style.display = 'table';
-                document.getElementById(activeOnly ? 'activeLoading' : 'compoundsLoading').classList.remove('show');
-            } catch (error) {
-                console.error('Failed to load compounds:', error);
-                document.getElementById(activeOnly ? 'activeLoading' : 'compoundsLoading').classList.remove('show');
-            }
+            document.getElementById('historyContent').innerHTML = html;
+        } catch (error) {
+            console.error('Failed to load history:', error);
         }
+    }
 
-        // Use SMILES
-        function useSMILES(smiles) {
-            document.getElementById('smiles').value = smiles;
-            document.getElementById('smiles').scrollIntoView({ behavior: 'smooth' });
-        }
+    // Utilities
+    function showError(id, message) {
+        const elem = document.getElementById(id);
+        elem.textContent = message;
+        elem.classList.remove('hidden');
+    }
 
-        // Switch tab
-        function switchTab(event, tabName) {
-            // Hide all
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-            
-            // Show selected
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+    function hideError(id) {
+        document.getElementById(id).classList.add('hidden');
+    }
 
-            if (tabName === 'compounds') {
-                loadCompoundsTable(false);
-            } else if (tabName === 'active') {
-                loadCompoundsTable(true);
-            } else if (tabName === 'history') {
-                loadHistory();
-            }
-        }
+    function showSuccess(id, message) {
+        const elem = document.getElementById(id);
+        elem.textContent = message;
+        elem.classList.remove('hidden');
+        setTimeout(() => elem.classList.add('hidden'), 3000);
+    }
 
-        // Load history
-        async function loadHistory() {
-            try {
-                const response = await fetch(`${API_URL}/history`);
-                const data = await response.json();
+    function showLoading(id, show) {
+        document.getElementById(id).classList.toggle('hidden', !show);
+    }
 
-                if (data.count === 0) {
-                    document.getElementById('historyContent').innerHTML = 
-                        '<p style="text-align: center; color: #999; padding: 20px;">No predictions yet</p>';
-                    return;
-                }
+    function clearPredictionForm() {
+        document.getElementById('smiles').value = '';
+        document.getElementById('compoundName').value = '';
+        document.getElementById('plantSource').value = '';
+        document.getElementById('predictionResult').innerHTML = '';
+    }
 
-                let html = '';
-                data.predictions.forEach(item => {
-                    const pred = item.prediction;
-                    const bioactivity = (pred.bioactivity_prediction * 100).toFixed(1);
-                    const toxicity = (pred.toxicity_prediction * 100).toFixed(1);
-                    
-                    html += `<div class="result-card">
-                        <div class="result-item">
-                            <span class="result-label">Compound:</span>
-                            <span>${pred.compound_name}</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Bioactivity:</span>
-                            <span>${bioactivity}%</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Toxicity:</span>
-                            <span>${toxicity}%</span>
-                        </div>
-                    </div>`;
-                });
-
-                document.getElementById('historyContent').innerHTML = html;
-            } catch (error) {
-                console.error('Failed to load history:', error);
-            }
-        }
-
-        // Utilities
-        function showError(id, message) {
-            const elem = document.getElementById(id);
-            elem.textContent = message;
-            elem.classList.add('show');
-        }
-
-        function hideError(id) {
-            document.getElementById(id).classList.remove('show');
-        }
-
-        function showSuccess(id, message) {
-            const elem = document.getElementById(id);
-            elem.textContent = message;
-            elem.classList.add('show');
-            setTimeout(() => elem.classList.remove('show'), 3000);
-        }
-
-        function showLoading(id, show) {
-            const elem = document.getElementById(id);
-            if (show) {
-                elem.classList.add('show');
-            } else {
-                elem.classList.remove('show');
-            }
-        }
-
-        function clearPredictionForm() {
-            document.getElementById('smiles').value = '';
-            document.getElementById('compoundName').value = '';
-            document.getElementById('plantSource').value = '';
-            document.getElementById('predictionResult').innerHTML = '';
-        }
-
-        function clearBatchForm() {
-            document.getElementById('batchSmiles').value = '';
-            document.getElementById('batchResult').innerHTML = '';
-        }
-    </script>
+    function clearBatchForm() {
+        document.getElementById('batchSmiles').value = '';
+        document.getElementById('batchResult').innerHTML = '';
+    }
+</script>
 </body>
 </html>

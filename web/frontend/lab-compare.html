@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lab Compare | VedaAI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2e3131",
+                        "primary-container": "#1a2f23",
+                        "secondary-container": "#00f4fe",
+                        "on-background": "#191c1c",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f8faf9",
+                        "surface-container-low": "#f2f4f3",
+                        "on-primary-fixed-variant": "#364c3e",
+                        "secondary-fixed-dim": "#00dce5",
+                        "surface-tint": "#4d6355",
+                        "tertiary-container": "#1d2f22",
+                        "surface-container": "#eceeed",
+                        "on-secondary-container": "#006c71",
+                        "on-primary-container": "#809787",
+                        "secondary": "#00696e",
+                        "primary": "#051a0f",
+                        "surface-variant": "#e1e3e2",
+                        "on-tertiary-container": "#839786",
+                        "on-surface": "#191c1c",
+                        "on-secondary-fixed-variant": "#004f53",
+                        "tertiary": "#091a0f",
+                        "on-tertiary-fixed": "#0e1f13",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#d3e8d5",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#b4ccbb",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#63f7ff",
+                        "tertiary-fixed-dim": "#b7ccb9",
+                        "on-secondary": "#ffffff",
+                        "outline": "#737973",
+                        "on-surface-variant": "#424843",
+                        "on-primary-fixed": "#0a2014",
+                        "surface": "#f8faf9",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f8faf9",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#b4ccbb",
+                        "outline-variant": "#c2c8c2",
+                        "surface-container-high": "#e6e9e8",
+                        "surface-dim": "#d8dada",
+                        "on-secondary-fixed": "#002021",
+                        "on-tertiary-fixed-variant": "#394b3d",
+                        "primary-fixed": "#d0e9d6",
+                        "surface-container-highest": "#e1e3e2",
+                        "inverse-on-surface": "#eff1f0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "section-gap": "80px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "16px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["JetBrains Mono"],
+                        "data-lg": ["JetBrains Mono"],
+                        "display-lg": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "body-md": ["JetBrains Mono"],
+                        "display-lg-mobile": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "data-lg": ["18px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .ai-glow {
+            box-shadow: 0 0 20px rgba(0, 244, 254, 0.15);
+            border: 1px solid rgba(0, 244, 254, 0.3);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d0e9d6; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-0 h-full z-40 bg-surface dark:bg-primary-container h-screen w-64 hidden md:flex flex-col border-r border-surface-variant/10">
+<div class="px-6 py-8">
+<div class="font-display-lg text-headline-md text-primary dark:text-secondary-fixed mb-1">VedaAI</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant/60 uppercase tracking-widest">Himalayan Hub</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-4 text-on-surface-variant dark:text-on-primary-container px-6 py-4 hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="biotech">biotech</span>
+<span class="font-body-md">AI Workspace</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant dark:text-on-primary-container px-6 py-4 hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="local_library">local_library</span>
+<span class="font-body-md">Herbarium</span>
+</a>
+<a class="flex items-center gap-4 bg-secondary-container/10 dark:bg-secondary/10 text-secondary dark:text-secondary-fixed-dim border-r-4 border-secondary px-6 py-4 shadow-[0_0_15px_rgba(0,244,254,0.1)] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="science">science</span>
+<span class="font-body-md">Lab Compare</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant dark:text-on-primary-container px-6 py-4 hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+<span class="font-body-md">Global Feed</span>
+</a>
+</nav>
+<div class="p-6 mt-auto">
+<button class="w-full py-3 bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center gap-2 hover:opacity-90 transition-all rounded-lg">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+                New Analysis
+            </button>
+<div class="mt-6 pt-6 border-t border-surface-variant/10 space-y-2">
+<a class="flex items-center gap-4 text-on-surface-variant px-2 py-2 font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
+                    Support
+                </a>
+<a class="flex items-center gap-4 text-on-surface-variant px-2 py-2 font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="folder_zip">folder_zip</span>
+                    Archive
+                </a>
+</div>
+</div>
+</aside>
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 right-0 z-30 md:left-64 bg-surface/80 backdrop-blur-xl border-b border-surface-variant/20">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-[1280px] mx-auto">
+<div class="flex items-center gap-8">
+<h1 class="font-display-lg text-headline-md tracking-tight text-primary">Lab Comparison</h1>
+<nav class="hidden lg:flex gap-6">
+<a class="font-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Dashboard</a>
+<a class="font-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Library</a>
+<a class="font-body-md text-secondary border-b-2 border-secondary pb-1" href="#">Reports</a>
+<a class="font-body-md text-on-surface-variant hover:text-secondary transition-colors" href="#">Research</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-md focus:ring-1 focus:ring-secondary w-64 transition-all" placeholder="Search specimens..." type="text"/>
+</div>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container transition-all rounded-full" data-icon="notifications">notifications</button>
+<div class="h-10 w-10 rounded-full overflow-hidden border-2 border-primary-fixed shadow-sm">
+<img alt="Profile" data-alt="Close-up portrait of a professional scientific researcher with a focused and serene expression. The lighting is soft and high-key, emphasizing clean skin and sharp details. The background is a blurred laboratory setting with soft botanical greens and clinical whites, reflecting the VedaAI brand identity of scientific etherealism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBph0wZXNUnHpOkAWmnBVvCBHbc1IpHg8N557tOI2MKBAKcm07zfpc8dsEo50eEHYS6o4clGwnS2-_YM7Ct-iZ6UGH2ugcwEDuVl_Nu6hpN7YV0ktDUJb8hXOhk2tc0y1IcdwXoaNJ9phCpPxKq6HqEbkxHqS4ByzYud8C9gQ5NnhL_PiAupXu1rSBF_hcvJw0Nw_QstYpfpWHkLO10APxmGwkEcvsvZBaOHnS4Cr5lWqaxuREUibbvT8eQdYDYenBHyflPV9Cps6-r"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 md:pl-64 min-h-screen">
+<div class="px-margin-mobile md:px-margin-desktop py-8 max-w-[1280px] mx-auto">
+<!-- Comparison Header Controls -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-section-gap gap-6">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary mb-2">Multi-Specimen Analysis</h2>
+<p class="font-body-md text-on-surface-variant max-w-lg">Comparative study of alkaloid concentrations and receptor binding across high-altitude adaptogens.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2 border border-outline-variant text-primary font-label-sm text-label-sm rounded-lg hover:bg-surface-container-low flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="file_download">file_download</span>
+                        Export PDF
+                    </button>
+<button class="px-6 py-2 bg-primary text-on-primary font-label-sm text-label-sm rounded-lg hover:shadow-lg flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="share">share</span>
+                        Share with Lab
+                    </button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Bento Comparison Grid -->
+<!-- Comparison Table (Left 8 Columns) -->
+<div class="lg:col-span-8 space-y-gutter">
+<div class="glass p-8 rounded-xl shadow-[0_20px_40px_rgba(26,47,35,0.05)] overflow-hidden">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline-md text-headline-md text-primary">Specimen Comparison</h3>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm rounded-full">3 Selected</span>
+<span class="px-3 py-1 border border-secondary text-secondary font-label-sm text-label-sm rounded-full">Live AI Data</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="border-b border-surface-variant/30">
+<th class="py-4 text-left font-label-sm text-label-sm text-on-surface-variant/60 uppercase tracking-widest">Metric</th>
+<th class="py-4 px-4 text-center">
+<div class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-primary-fixed mb-2">
+<img alt="Rhodiola" data-alt="A macro scientific photography shot of a Rhodiola rosea root segment, showcasing its characteristic golden-red texture. The image is brightly lit with a clean, laboratory-style background featuring soft green bokeh. The mood is clinical yet ethereal, focusing on the organic complexity of the specimen's structure." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbEixfV-n-lYY_aVHkGPcBkBis1g-Xe4d6P0s2dEeD045gyFRYMORx4JAUBvwHzM8jZcC4KUaxQiI5e6lRuvuVsWhWNw7V21tE8KgLzSj9f89meaoM8e3vX0kcVv3nlGYpW1EWbHw8drsyMv2hQjjzBSPf1-tt0PautfkoNPLOXW6Uwv9zxsakN8sCpbMUCsGu0fXBXhewnM7hUHZYfS9UsJhw6WtkX7ZcHXSjiDA7EL51u59QcCvJENqt2WD8SHL3a_y_nPXhlqZy"/>
+</div>
+<span class="font-headline-md text-[16px] text-primary">Rhodiola Rosea</span>
+</div>
+</th>
+<th class="py-4 px-4 text-center">
+<div class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-primary-fixed mb-2">
+<img alt="Ashwagandha" data-alt="High-resolution botanical study of Withania somnifera (Ashwagandha) berries and leaves against a pristine, soft-white background. The lighting is sharp and analytical, emphasizing the delicate veins of the leaves and the vibrant red of the berries. The visual style is minimal and sophisticated, evoking high-end laboratory aesthetics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBL5TDtLuXUhEJDzBpTCbhP23Tt7eTyVlomzAoz0M-zb7gFActNIKsRXnt4BR_aakl48z1adph3rru2rHfEBccrHLm8omcqT9zVIYP15CB819fGNbY7YZG5h6nqz5Dt1Y6vVWE6s04oBwma0t0y-j489Y1WRHBnW0GjZLDGU8kdCJ8juOZPVSglXhC5rVEjdZz-sw10vfOOAcrGSIAdrBFQB6K4UITV98VUW08Iq9p8-RMs1MUi91Kp3j07AaUU66YrqRo92xIrGA19"/>
+</div>
+<span class="font-headline-md text-[16px] text-primary">Ashwagandha</span>
+</div>
+</th>
+<th class="py-4 px-4 text-center">
+<div class="flex flex-col items-center">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-primary-fixed mb-2">
+<img alt="Cordyceps" data-alt="Detailed scientific imagery of Cordyceps sinensis fruiting bodies. The specimen is presented on a clean, glass surface with soft, diffused lighting that highlights its unique organic form and earthy tones. The background is a minimalist mix of Alpine Mist and high-altitude clarity, maintaining a serene scientific atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeNjEBWBM6WrFBZV1m0fu-3oZe4k7mOcdJc4przGY6oys_Du2b-mRBV-E39ByStbaS29XnOAIqgRW05b066_nk7rBDcR-hs5gY1VEr39cY-NalJMx4UUR7CaLGGdqQv6iUVnNqqKND6p9Sg6SdXUHE0zQzB-XlzOm6wW3tHjZ1WYHeYmAmFQ0_Gz5muCXRVMbeTm6qid7MCM5R-okVo-tlOwnH8WvMR5GEmLv8oBsAOT8npOwEXKxbQFvQrVCKF89uJjsuCi5hLF-n"/>
+</div>
+<span class="font-headline-md text-[16px] text-primary">Cordyceps</span>
+</div>
+</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-variant/20 font-body-md text-body-md">
+<tr>
+<td class="py-6 font-semibold text-primary">Bioavailability</td>
+<td class="py-6 px-4 text-center font-data-lg text-data-lg">84.2%</td>
+<td class="py-6 px-4 text-center font-data-lg text-data-lg">68.5%</td>
+<td class="py-6 px-4 text-center font-data-lg text-data-lg text-secondary">91.8%</td>
+</tr>
+<tr>
+<td class="py-6 font-semibold text-primary">Toxicity Index (LD50)</td>
+<td class="py-6 px-4 text-center font-data-lg text-data-lg">0.02</td>
+<td class="py-6 px-4 text-center font-data-lg text-data-lg">0.05</td>
+<td class="py-6 px-4 text-center font-data-lg text-data-lg">0.01</td>
+</tr>
+<tr>
+<td class="py-6 font-semibold text-primary">Receptor Affinity</td>
+<td class="py-6 px-4 text-center font-data-lg text-data-lg">High</td>
+<td class="py-6 px-4 text-center font-data-lg text-data-lg text-secondary">V. High</td>
+<td class="py-6 px-4 text-center font-data-lg text-data-lg">Moderate</td>
+</tr>
+<tr>
+<td class="py-6 font-semibold text-primary">Solubility (H2O)</td>
+<td class="py-6 px-4 text-center font-data-lg text-data-lg">High</td>
+<td class="py-6 px-4 text-center font-data-lg text-data-lg">Low</td>
+<td class="py-6 px-4 text-center font-data-lg text-data-lg">Med</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Interactive Efficacy Chart -->
+<div class="glass p-8 rounded-xl shadow-[0_20px_40px_rgba(26,47,35,0.05)]">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline-md text-headline-md text-primary">Efficacy Projections</h3>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span class="font-label-sm text-label-sm">Rhodiola</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-secondary"></div>
+<span class="font-label-sm text-label-sm">Ashwagandha</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary-container"></div>
+<span class="font-label-sm text-label-sm">Cordyceps</span>
+</div>
+</div>
+</div>
+<div class="relative h-64 w-full flex items-end justify-between gap-4 px-8 mt-12">
+<!-- Simulated Chart Bars -->
+<div class="flex-1 flex flex-col items-center group">
+<div class="w-full flex justify-center gap-1 items-end">
+<div class="w-6 bg-primary/20 rounded-t-lg transition-all group-hover:bg-primary/40" style="height: 120px;"></div>
+<div class="w-6 bg-secondary rounded-t-lg transition-all group-hover:scale-y-105" style="height: 180px;"></div>
+<div class="w-6 bg-primary-container rounded-t-lg transition-all group-hover:bg-primary-container/80" style="height: 140px;"></div>
+</div>
+<span class="mt-4 font-label-sm text-label-sm text-on-surface-variant">Cognition</span>
+</div>
+<div class="flex-1 flex flex-col items-center group">
+<div class="w-full flex justify-center gap-1 items-end">
+<div class="w-6 bg-primary/20 rounded-t-lg transition-all" style="height: 160px;"></div>
+<div class="w-6 bg-secondary rounded-t-lg transition-all" style="height: 140px;"></div>
+<div class="w-6 bg-primary-container rounded-t-lg transition-all" style="height: 200px;"></div>
+</div>
+<span class="mt-4 font-label-sm text-label-sm text-on-surface-variant">Cell Repair</span>
+</div>
+<div class="flex-1 flex flex-col items-center group">
+<div class="w-full flex justify-center gap-1 items-end">
+<div class="w-6 bg-primary/20 rounded-t-lg transition-all" style="height: 200px;"></div>
+<div class="w-6 bg-secondary rounded-t-lg transition-all" style="height: 180px;"></div>
+<div class="w-6 bg-primary-container rounded-t-lg transition-all" style="height: 110px;"></div>
+</div>
+<span class="mt-4 font-label-sm text-label-sm text-on-surface-variant">Inflammation</span>
+</div>
+<div class="flex-1 flex flex-col items-center group">
+<div class="w-full flex justify-center gap-1 items-end">
+<div class="w-6 bg-primary/20 rounded-t-lg transition-all" style="height: 90px;"></div>
+<div class="w-6 bg-secondary rounded-t-lg transition-all" style="height: 160px;"></div>
+<div class="w-6 bg-primary-container rounded-t-lg transition-all" style="height: 150px;"></div>
+</div>
+<span class="mt-4 font-label-sm text-label-sm text-on-surface-variant">Metabolism</span>
+</div>
+<!-- Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between -z-10 pointer-events-none opacity-10">
+<div class="border-t border-primary w-full"></div>
+<div class="border-t border-primary w-full"></div>
+<div class="border-t border-primary w-full"></div>
+<div class="border-t border-primary w-full"></div>
+<div class="border-t border-primary w-full"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Insights Sidebar (Right 4 Columns) -->
+<div class="lg:col-span-4 space-y-gutter">
+<div class="glass ai-glow p-8 rounded-xl h-fit">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-secondary" data-icon="auto_awesome">auto_awesome</span>
+<h3 class="font-headline-md text-[20px] text-primary">Veda AI Synthesis</h3>
+</div>
+<div class="space-y-6">
+<div class="p-4 bg-secondary-container/5 rounded-lg border-l-4 border-secondary">
+<p class="font-body-md text-on-surface mb-2">Optimal Synergy Found</p>
+<p class="font-label-sm text-[12px] text-on-surface-variant">Combining Rhodiola and Cordyceps at a 3:1 ratio may increase ATP production efficiency by 24% compared to isolated use.</p>
+</div>
+<div class="space-y-4">
+<h4 class="font-label-sm text-label-sm uppercase text-on-surface-variant/60 tracking-widest">Active Alerts</h4>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-error text-[20px]" data-icon="warning">warning</span>
+<div>
+<p class="font-body-md text-primary font-semibold">Toxicity Threshold</p>
+<p class="font-label-sm text-[12px] text-on-surface-variant">Ashwagandha extract exceeds base toxicity in pediatric simulations.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="info">info</span>
+<div>
+<p class="font-body-md text-primary font-semibold">Binding Update</p>
+<p class="font-label-sm text-[12px] text-on-surface-variant">New research suggests 5-HTP receptor affinity is modulated by Cordycepin.</p>
+</div>
+</div>
+</div>
+<div class="pt-6 border-t border-surface-variant/20">
+<h4 class="font-label-sm text-label-sm uppercase text-on-surface-variant/60 tracking-widest mb-4">Laboratory Actions</h4>
+<div class="grid grid-cols-2 gap-3">
+<button class="p-4 bg-surface-container-low rounded-lg text-center hover:bg-surface-container transition-all group">
+<span class="material-symbols-outlined block mb-1 text-on-surface-variant group-hover:text-secondary" data-icon="experiment">experiment</span>
+<span class="font-label-sm text-label-sm">Simulate Mix</span>
+</button>
+<button class="p-4 bg-surface-container-low rounded-lg text-center hover:bg-surface-container transition-all group">
+<span class="material-symbols-outlined block mb-1 text-on-surface-variant group-hover:text-secondary" data-icon="cloud_sync">cloud_sync</span>
+<span class="font-label-sm text-label-sm">Resync Labs</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Reports Mini-Card -->
+<div class="glass p-6 rounded-xl">
+<h3 class="font-label-sm text-label-sm uppercase text-on-surface-variant/60 tracking-widest mb-4">Recent Reports</h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between group cursor-pointer">
+<div>
+<p class="font-body-md text-primary group-hover:text-secondary transition-colors">Panax Ginseng Stability</p>
+<p class="font-label-sm text-[10px] text-on-surface-variant">Oct 24, 2023 • Lab-04</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div>
+<p class="font-body-md text-primary group-hover:text-secondary transition-colors">Brahmi Neural Linkage</p>
+<p class="font-label-sm text-[10px] text-on-surface-variant">Oct 22, 2023 • Lab-01</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Shared Component - Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 md:hidden bg-surface/90 backdrop-blur-lg border-t border-white/20">
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="biotech">biotech</span>
+<span class="font-label-sm text-[10px]">Workspace</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="local_library">local_library</span>
+<span class="font-label-sm text-[10px]">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary" href="#">
+<span class="material-symbols-outlined" data-icon="science">science</span>
+<span class="font-label-sm text-[10px]">Compare</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-label-sm text-[10px]">Feed</span>
+</a>
+</nav>
+<script>
+        // Simple Interaction logic
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.add('scale-95');
+                setTimeout(() => this.classList.remove('scale-95'), 100);
+            });
+        });
+
+        // Search Bar Focus Effect
+        const searchInput = document.querySelector('input[type="text"]');
+        if(searchInput) {
+            searchInput.addEventListener('focus', () => {
+                searchInput.parentElement.classList.add('ai-glow');
+            });
+            searchInput.addEventListener('blur', () => {
+                searchInput.parentElement.classList.remove('ai-glow');
+            });
+        }
+    </script>
+</body></html>

@@ -85,8 +85,15 @@ class MolecularGraphBuilder:
             
             # Convert to tensors
             x = torch.tensor(node_features, dtype=torch.float)
-            edge_index = torch.tensor(edge_indices, dtype=torch.long).t().contiguous()
-            edge_attr = torch.tensor(edge_features, dtype=torch.float)
+            
+            if len(edge_indices) > 0:
+                edge_index = torch.tensor(edge_indices, dtype=torch.long).t().contiguous()
+                edge_attr = torch.tensor(edge_features, dtype=torch.float)
+            else:
+                # Handle molecules with no bonds
+                edge_index = torch.zeros((2, 0), dtype=torch.long)
+                edge_attr = torch.zeros((0, len(self.bond_features['bond_type']) * 2 + 2), dtype=torch.float)
+            
             y = torch.tensor([label], dtype=torch.long)
             
             # Create PyG Data object
@@ -213,14 +220,20 @@ class AntimicrobialDataset(Dataset):
         """
         self.csv_file = csv_file
         self.graph_builder = MolecularGraphBuilder()
+        self.data_list = []
         
         super().__init__(root, transform, pre_transform)
-        
-        # Load the processed data (use weights_only=False for compatibility)
-        import warnings
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            self.data, self.slices = torch.load(self.processed_paths[0], weights_only=False)
+    
+    def __len__(self) -> int:
+        """Return the number of graphs in the dataset"""
+        return len(self.data_list)
+    
+    def __getitem__(self, idx: int) -> Data:
+        """Get a single graph by index"""
+        data = self.data_list[idx]
+        if self.transform is not None:
+            data = self.transform(data)
+        return data
     
     @property
     def raw_file_names(self) -> List[str]:
@@ -230,7 +243,7 @@ class AntimicrobialDataset(Dataset):
     @property
     def processed_file_names(self) -> List[str]:
         """Names of processed files"""
-        return ['data.pt']
+        return ['data_list.pkl']
     
     def download(self):
         """Download is not needed - we already have the CSV"""
@@ -271,6 +284,8 @@ class AntimicrobialDataset(Dataset):
             if graph is not None:
                 # Add molecule name for tracking
                 graph.compound_name = row.get('compound_name', f'compound_{idx}')
+                if self.pre_transform is not None:
+                    graph = self.pre_transform(graph)
                 data_list.append(graph)
             else:
                 failed += 1
@@ -282,32 +297,37 @@ class AntimicrobialDataset(Dataset):
         if failed > 0:
             print(f"⚠️  Failed to convert {failed} molecules")
         
-        # Apply pre-transforms if any
-        if self.pre_transform is not None:
-            data_list = [self.pre_transform(data) for data in data_list]
-        
         # Save processed data
-        from torch_geometric.data import InMemoryDataset
-        data, slices = InMemoryDataset.collate(data_list)
-        torch.save((data, slices), self.processed_paths[0])
+        import pickle
+        with open(self.processed_paths[0], 'wb') as f:
+            pickle.dump(data_list, f)
         
-        print(f"💾 Saved processed graphs to {self.processed_paths[0]}")
+        self.data_list = data_list
+        print(f"💾 Saved {len(data_list)} graphs to {self.processed_paths[0]}")
+    
+    def load(self):
+        """Load pre-processed data"""
+        import pickle
+        with open(self.processed_paths[0], 'rb') as f:
+            self.data_list = pickle.load(f)
     
     def get_statistics(self) -> Dict:
         """Get dataset statistics"""
+        if not self.data_list:
+            self.load()
         
         stats = {
-            'num_graphs': len(self),
-            'num_features': self.num_node_features,
-            'num_edge_features': self.num_edge_features,
+            'num_graphs': len(self.data_list),
+            'num_features': self.data_list[0].num_node_features if self.data_list else 0,
+            'num_edge_features': self.data_list[0].num_edge_features if self.data_list else 0,
             'num_classes': 2,
-            'avg_nodes': np.mean([data.num_nodes for data in self]),
-            'avg_edges': np.mean([data.num_edges for data in self]),
+            'avg_nodes': np.mean([data.num_nodes for data in self.data_list]) if self.data_list else 0,
+            'avg_edges': np.mean([data.num_edges for data in self.data_list]) if self.data_list else 0,
             'class_distribution': {}
         }
         
         # Count labels
-        labels = [data.y.item() for data in self]
+        labels = [data.y.item() for data in self.data_list]
         stats['class_distribution']['inactive'] = labels.count(0)
         stats['class_distribution']['active'] = labels.count(1)
         

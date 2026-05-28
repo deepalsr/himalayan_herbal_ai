@@ -1,0 +1,6 @@
+{
+  "model_type": "AntimicrobialGNN",
+  "dataset_size": 30,
+  "training_date": "2026-05-27T21:40:36.859224",
+  "device": "cpu"
+}
