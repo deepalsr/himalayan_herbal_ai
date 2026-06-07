@@ -32,56 +32,29 @@ else
 fi
 
 echo ""
-echo "2. Setting up web backend (port 5000)..."
-
-# Install backend dependencies
-if [ ! -d "web/backend/venv" ]; then
-    echo "   Creating virtual environment..."
-    python -m venv web/backend/venv
-fi
-
-echo "   Activating virtual environment..."
-source web/backend/venv/bin/activate
-
-echo "   Installing dependencies..."
-pip install -q -r web/backend/requirements.txt
-
-echo "   ✓ Backend dependencies installed"
-
-echo ""
-echo "3. Starting web backend server..."
-cd web/backend
-
-# Kill any existing Flask process on port 5000
-pkill -f "flask run" || true
-sleep 1
-
-python app.py > /tmp/backend.log 2>&1 &
-BACKEND_PID=$!
-sleep 2
-
-if kill -0 $BACKEND_PID 2>/dev/null; then
-    echo "   ✓ Backend server started (PID: $BACKEND_PID)"
-else
-    echo "   ✗ Failed to start backend server"
-    cat /tmp/backend.log
-    exit 1
-fi
+echo "2. Starting API server (serves frontend + API on port 8000)..."
 
 cd "$PROJECT_DIR"
 
+export KMP_DUPLICATE_LIB_OK=TRUE
+python -m uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload > /tmp/api.log 2>&1 &
+API_PID=$!
+sleep 3
+
+if kill -0 $API_PID 2>/dev/null; then
+    echo "   ✓ Server started (PID: $API_PID)"
+else
+    echo "   ✗ Failed to start server"
+    cat /tmp/api.log
+    exit 1
+fi
+
 echo ""
 echo "================================"
-echo "✓ Web Interface Ready!"
+echo "✓ Ready!"
 echo "================================"
 echo ""
-echo "Frontend:  http://localhost:5000"
-echo "Backend:   http://localhost:5000/api"
-echo "Main API:  http://localhost:8000"
+echo "App:  http://localhost:8000"
+echo "API:  http://localhost:8000/docs"
 echo ""
-echo "Open your browser to http://localhost:5000"
-echo ""
-echo "Logs:"
-echo "  - Frontend:  /tmp/backend.log"
-echo "  - Main API:  /tmp/api.log"
-echo ""
+echo "Logs: /tmp/api.log"

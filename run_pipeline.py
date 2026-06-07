@@ -277,7 +277,7 @@ def main():
     )
     parser.add_argument(
         "--phase",
-        choices=["all", "data", "graph", "bioactivity", "toxicity", "gnn", "report"],
+        choices=["all", "data", "graph", "bioactivity", "toxicity", "gnn", "report", "benchmark"],
         default="all",
         help="Which phase to run"
     )
@@ -317,6 +317,16 @@ def main():
     # Phase 3c: GNN Training
     if args.phase in ["all", "gnn"] and not args.skip_gnn:
         results['gnn'] = run_gnn_training()
+
+    # Phase 3d: Benchmark
+    if args.phase in ["all", "benchmark"]:
+        try:
+            from src.models.benchmark import run_benchmark
+            run_benchmark()
+            results['benchmark'] = True
+        except Exception as e:
+            print(f"\n❌ Benchmark Failed: {e}")
+            results['benchmark'] = False
 
     # Phase 4: Report
     if args.phase in ["all", "report"]:

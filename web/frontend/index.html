@@ -1,580 +1,1315 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Himalayan Herbal AI - VedaAI</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#051a0f",
-                        "on-primary": "#ffffff",
-                        "primary-container": "#1a2f23",
-                        "on-primary-container": "#809787",
-                        "secondary": "#00696e",
-                        "on-secondary": "#ffffff",
-                        "secondary-container": "#00f4fe",
-                        "on-secondary-container": "#006c71",
-                        "secondary-fixed": "#63f7ff",
-                        "secondary-fixed-dim": "#00dce5",
-                        "surface": "#f8faf9",
-                        "on-surface": "#191c1c",
-                        "surface-variant": "#e1e3e2",
-                        "on-surface-variant": "#424843",
-                        "background": "#f8faf9",
-                        "on-background": "#191c1c",
-                        "error": "#ba1a1a",
-                        "on-error": "#ffffff",
-                    },
-                    spacing: {
-                        "section-gap": "80px",
-                        "gutter": "24px",
-                        "margin-desktop": "64px",
-                        "margin-mobile": "16px",
-                    },
-                    fontFamily: {
-                        "display": ["Playfair Display"],
-                        "body": ["JetBrains Mono"],
-                    },
-                },
-            },
-        }
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Himalayan Herbal AI — Antimicrobial Drug Discovery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
     <style>
-        .glass {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        :root {
+            --sage:      #4a7c59;
+            --sage-lt:   #6fa882;
+            --sage-dk:   #2d5238;
+            --cream:     #f5f0e8;
+            --parchment: #ede7d9;
+            --ink:       #1a1a14;
+            --ink-lt:    #3d3d30;
+            --amber:     #c8860a;
+            --amber-lt:  #f0b429;
+            --red:       #c0392b;
+            --stone:     #8a8474;
+            --border:    #d4cec2;
+            --white:     #ffffff;
+            --mono:      'DM Mono', monospace;
+            --serif:     'Playfair Display', serif;
+            --sans:      'DM Sans', sans-serif;
         }
-        .ai-glow {
-            box-shadow: 0 0 20px rgba(0, 244, 254, 0.15);
-            border: 1px solid rgba(0, 244, 254, 0.3);
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--sans);
+            background: var(--cream);
+            color: var(--ink);
+            min-height: 100vh;
+            font-size: 15px;
+            line-height: 1.6;
         }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+
+        /* ── Sidebar layout ─────────────────────────────────── */
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: auto 1fr;
+            min-height: 100vh;
         }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #d0e9d6; border-radius: 10px; }
+
+        /* ── Sidebar ─────────────────────────────────────────── */
+        .sidebar {
+            grid-row: 1 / 3;
+            background: var(--sage-dk);
+            color: var(--cream);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 32px 28px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .brand-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .brand-name {
+            font-family: var(--serif);
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--cream);
+            margin-bottom: 4px;
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            font-family: var(--mono);
+            color: var(--sage-lt);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .sidebar-status {
+            padding: 16px 28px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 6px;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #999;
+            flex-shrink: 0;
+        }
+
+        .status-dot.live { background: #4ade80; animation: blink 2s infinite; }
+        .status-dot.err  { background: #f87171; }
+
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        .sidebar-nav {
+            padding: 20px 0;
+            flex: 1;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-family: var(--mono);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--sage-lt);
+            padding: 0 28px;
+            margin-bottom: 6px;
+            margin-top: 16px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 28px;
+            cursor: pointer;
+            font-size: 13.5px;
+            color: rgba(255,255,255,0.65);
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+            user-select: none;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.06); color: var(--cream); }
+        .nav-item.active { background: rgba(255,255,255,0.1); color: var(--cream); border-left-color: var(--sage-lt); }
+
+        .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 20px 28px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            font-family: var(--mono);
+        }
+
+        /* ── Top bar ─────────────────────────────────────────── */
+        .topbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-title {
+            font-family: var(--serif);
+            font-size: 18px;
+            color: var(--ink);
+        }
+
+        .topbar-meta {
+            font-size: 12px;
+            font-family: var(--mono);
+            color: var(--stone);
+        }
+
+        /* ── Main content ────────────────────────────────────── */
+        .main {
+            padding: 36px 40px;
+            max-width: 1000px;
+        }
+
+        /* ── Panels ──────────────────────────────────────────── */
+        .panel-page { display: none; }
+        .panel-page.active { display: block; }
+
+        /* ── Predict panel ───────────────────────────────────── */
+        .predict-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .card-head {
+            padding: 16px 22px;
+            border-bottom: 1px solid var(--parchment);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-head-icon { font-size: 16px; }
+
+        .card-head-title {
+            font-family: var(--serif);
+            font-size: 15px;
+            color: var(--ink);
+            font-weight: 400;
+        }
+
+        .card-body { padding: 22px; }
+
+        /* ── Form elements ───────────────────────────────────── */
+        .field { margin-bottom: 16px; }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-family: var(--mono);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--stone);
+            margin-bottom: 6px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            background: var(--cream);
+            font-family: var(--mono);
+            font-size: 12.5px;
+            color: var(--ink);
+            transition: border-color 0.15s, background 0.15s;
+            resize: vertical;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--sage);
+            background: var(--white);
+        }
+
+        textarea { min-height: 80px; }
+
+        /* ── Buttons ─────────────────────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-family: var(--sans);
+            font-size: 13.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--sage-dk);
+            color: var(--white);
+        }
+
+        .btn-primary:hover { background: var(--sage); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--stone);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover { border-color: var(--sage); color: var(--sage); }
+
+        .btn-example {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: var(--parchment);
+            color: var(--ink-lt);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: var(--mono);
+            transition: all 0.15s;
+        }
+
+        .btn-example:hover { background: var(--sage-dk); color: var(--white); border-color: var(--sage-dk); }
+
+        .btn-row { display: flex; gap: 10px; align-items: center; margin-top: 6px; }
+
+        /* ── Examples strip ──────────────────────────────────── */
+        .examples-strip {
+            margin-bottom: 6px;
+        }
+
+        .examples-label {
+            font-size: 11px;
+            font-family: var(--mono);
+            color: var(--stone);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .examples-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        /* ── Result display ──────────────────────────────────── */
+        .result-block {
+            margin-top: 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .result-block.show { display: block; }
+
+        .result-head {
+            background: var(--sage-dk);
+            color: var(--cream);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .result-head-name {
+            font-family: var(--serif);
+            font-size: 16px;
+            font-style: italic;
+        }
+
+        .tier-badge {
+            font-size: 12px;
+            font-family: var(--mono);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .tier-promising { background: #dcfce7; color: #166534; }
+        .tier-moderate  { background: #fef3c7; color: #92400e; }
+        .tier-weak      { background: #fee2e2; color: #991b1b; }
+
+        .result-scores {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-bottom: 1px solid var(--parchment);
+        }
+
+        .score-cell {
+            padding: 18px 20px;
+            border-right: 1px solid var(--parchment);
+            text-align: center;
+        }
+
+        .score-cell:last-child { border-right: none; }
+
+        .score-val {
+            font-family: var(--mono);
+            font-size: 26px;
+            font-weight: 500;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .score-val.good  { color: var(--sage); }
+        .score-val.warn  { color: var(--amber); }
+        .score-val.bad   { color: var(--red); }
+
+        .score-label {
+            font-size: 11px;
+            font-family: var(--mono);
+            color: var(--stone);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .score-bar-wrap {
+            height: 4px;
+            background: var(--parchment);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .score-bar { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+        .bar-bio { background: var(--sage); }
+        .bar-tox { background: var(--red); }
+        .bar-comp { background: var(--amber); }
+
+        .result-details {
+            padding: 16px 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--parchment);
+            font-size: 13px;
+        }
+
+        .detail-row:nth-child(odd) { padding-right: 20px; }
+        .detail-row:nth-child(even) { padding-left: 20px; border-left: 1px solid var(--parchment); }
+
+        .detail-key { color: var(--stone); }
+        .detail-val { font-family: var(--mono); font-size: 12.5px; font-weight: 500; }
+
+        .result-rec {
+            padding: 14px 20px;
+            background: var(--parchment);
+            font-size: 13px;
+            color: var(--ink-lt);
+            border-top: 1px solid var(--border);
+            font-style: italic;
+        }
+
+        /* ── Spinners / states ───────────────────────────────── */
+        .loading-state {
+            display: none;
+            padding: 24px;
+            text-align: center;
+            color: var(--stone);
+            font-size: 13px;
+            font-family: var(--mono);
+        }
+
+        .loading-state.show { display: block; }
+
+        .spinner {
+            width: 24px; height: 24px;
+            border: 2px solid var(--parchment);
+            border-top-color: var(--sage);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .err-msg {
+            display: none;
+            padding: 10px 14px;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 5px;
+            font-size: 13px;
+            font-family: var(--mono);
+            margin-top: 10px;
+        }
+
+        .err-msg.show { display: block; }
+
+        /* ── Dataset panel ───────────────────────────────────── */
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-num {
+            font-family: var(--mono);
+            font-size: 32px;
+            font-weight: 500;
+            color: var(--sage-dk);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-lbl {
+            font-size: 12px;
+            font-family: var(--mono);
+            color: var(--stone);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* ── Table ───────────────────────────────────────────── */
+        .tbl-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            background: var(--sage-dk);
+            color: var(--cream);
+            padding: 11px 14px;
+            text-align: left;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--parchment);
+            vertical-align: middle;
+        }
+
+        tr:hover td { background: var(--cream); }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-family: var(--mono);
+        }
+
+        .badge-active   { background: #dcfce7; color: #166534; }
+        .badge-inactive { background: #f3f4f6; color: #6b7280; }
+
+        .smiles-cell {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--stone);
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ── Benchmark panel ─────────────────────────────────── */
+        .bench-table {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .bench-head {
+            background: var(--parchment);
+            padding: 14px 20px;
+            font-family: var(--serif);
+            font-size: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .bench-row {
+            display: grid;
+            grid-template-columns: 180px 1fr 1fr 1fr;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--parchment);
+            align-items: center;
+        }
+
+        .bench-row:last-child { border-bottom: none; }
+        .bench-row.header { background: var(--cream); font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--stone); }
+        .bench-row.highlight { background: rgba(74,124,89,0.06); }
+
+        .bench-model { font-size: 13.5px; font-weight: 500; }
+        .bench-model.ours { color: var(--sage-dk); font-weight: 600; }
+
+        .metric-val { font-family: var(--mono); font-size: 13px; }
+        .metric-val .std { font-size: 10px; color: var(--stone); }
+
+        .metric-bar-outer { height: 6px; background: var(--parchment); border-radius: 3px; margin-top: 4px; width: 120px; }
+        .metric-bar-inner { height: 100%; border-radius: 3px; background: var(--sage); }
+
+        /* ── About panel ─────────────────────────────────────── */
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+        .info-block {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .info-block h3 {
+            font-family: var(--serif);
+            font-size: 17px;
+            margin-bottom: 14px;
+            color: var(--sage-dk);
+        }
+
+        .info-block p {
+            font-size: 13.5px;
+            color: var(--ink-lt);
+            line-height: 1.75;
+            margin-bottom: 10px;
+        }
+
+        .pill-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+        .pill {
+            font-family: var(--mono);
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--parchment);
+            border: 1px solid var(--border);
+            color: var(--ink-lt);
+        }
+
+        .metric-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--parchment); font-size: 13px; }
+        .metric-row:last-child { border-bottom: none; }
+        .metric-key { color: var(--stone); }
+        .metric-num { font-family: var(--mono); font-weight: 500; color: var(--sage-dk); }
+
+        .full-span { grid-column: 1 / -1; }
+
+        /* ── Batch panel ─────────────────────────────────────── */
+        .batch-result-row {
+            display: grid;
+            grid-template-columns: 1fr 100px 100px 100px 120px;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--parchment);
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .batch-result-row.header {
+            background: var(--sage-dk);
+            color: var(--cream);
+            font-family: var(--mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* ── Tabs ────────────────────────────────────────────── */
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            font-size: 13px;
+            font-family: var(--mono);
+            border: none;
+            background: none;
+            color: var(--stone);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.15s;
+        }
+
+        .tab-btn:hover { color: var(--sage); }
+        .tab-btn.active { color: var(--sage-dk); border-bottom-color: var(--sage-dk); font-weight: 500; }
+
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* ── Responsive ──────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .predict-grid { grid-template-columns: 1fr; }
+            .about-grid { grid-template-columns: 1fr; }
+            .result-scores { grid-template-columns: 1fr; }
+            .result-details { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
-<body class="bg-background text-on-background font-body min-h-screen">
-<!-- Navigation Bar -->
-<header class="fixed top-0 right-0 left-0 z-30 bg-surface/80 backdrop-blur-xl border-b border-surface-variant/20">
-    <div class="flex justify-between items-center w-full px-8 py-4 max-w-full mx-auto">
-        <div class="flex items-center gap-8">
-            <div class="font-display text-2xl font-bold text-primary">🌿 VedaAI</div>
-            <nav class="hidden lg:flex gap-6">
-                <a class="text-sm text-on-surface-variant hover:text-secondary transition-colors" href="#predict">Predict</a>
-                <a class="text-sm text-on-surface-variant hover:text-secondary transition-colors" href="#batch">Batch</a>
-                <a class="text-sm text-on-surface-variant hover:text-secondary transition-colors" href="#explorer">Compounds</a>
-            </nav>
-        </div>
-        <div class="flex items-center gap-4">
-            <div class="relative hidden sm:block">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="search">search</span>
-                <input class="pl-10 pr-4 py-2 bg-surface-variant/20 border border-surface-variant rounded-full text-sm focus:ring-1 focus:ring-secondary w-48 transition-all" placeholder="Search compounds..." type="text"/>
-            </div>
-            <div class="flex items-center gap-2 px-3 py-1 bg-secondary-container/10 rounded-full">
-                <div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
-                <span class="text-xs font-mono text-secondary" id="statusText">Connecting...</span>
-            </div>
-        </div>
-    </div>
-</header>
+<body>
 
-<!-- Main Content -->
-<main class="pt-24 min-h-screen">
-    <div class="px-8 py-8 max-w-7xl mx-auto">
-        <!-- Hero Section -->
-        <div class="mb-section-gap">
-            <div class="glass p-12 rounded-2xl shadow-lg">
-                <h1 class="font-display text-5xl font-bold text-primary mb-4">Antimicrobial Compound Predictor</h1>
-                <p class="text-lg text-on-surface-variant max-w-2xl">Discover bioactive compounds from Himalayan medicinal plants using AI-powered molecular analysis. Predict bioactivity and toxicity instantly.</p>
+<div class="layout">
+
+    <!-- ── Sidebar ─────────────────────────────────────────── -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-icon">🌿</span>
+            <div class="brand-name">Himalayan Herbal AI</div>
+            <div class="brand-sub">Drug Discovery Platform</div>
+        </div>
+
+        <div class="sidebar-status">
+            <div class="status-row">
+                <div class="status-dot" id="apiDot"></div>
+                <span id="apiStatus">Connecting…</span>
+            </div>
+            <div class="status-row">
+                <div class="status-dot" id="bioDot"></div>
+                <span id="bioStatus">Bioactivity model</span>
+            </div>
+            <div class="status-row">
+                <div class="status-dot" id="toxDot"></div>
+                <span id="toxStatus">Toxicity model</span>
             </div>
         </div>
 
-        <!-- Prediction Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-section-gap" id="predict">
-            <!-- Single Prediction (Left 8 Cols) -->
-            <div class="lg:col-span-8 space-y-gutter">
-                <div class="glass p-8 rounded-xl shadow-lg">
-                    <div class="flex items-center gap-3 mb-6">
-                        <span class="material-symbols-outlined text-secondary" data-icon="experiment">experiment</span>
-                        <h2 class="font-display text-2xl font-semibold text-primary">Single Compound Analysis</h2>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-on-surface mb-2">SMILES String</label>
-                            <textarea id="smiles" class="w-full p-3 bg-surface-variant/5 border border-surface-variant rounded-lg font-mono text-sm focus:ring-1 focus:ring-secondary focus:border-transparent transition-all" placeholder="E.g., CC(=O)Cc1ccc(O)c(O)cc1" rows="3"></textarea>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-on-surface mb-2">Compound Name (Optional)</label>
-                                <input type="text" id="compoundName" class="w-full p-3 bg-surface-variant/5 border border-surface-variant rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-transparent transition-all" placeholder="E.g., Aspirin analog">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-on-surface mb-2">Plant Source (Optional)</label>
-                                <input type="text" id="plantSource" class="w-full p-3 bg-surface-variant/5 border border-surface-variant rounded-lg text-sm focus:ring-1 focus:ring-secondary focus:border-transparent transition-all" placeholder="E.g., Himalayan plants">
-                            </div>
-                        </div>
-
-                        <div class="flex gap-3">
-                            <button onclick="predictSingle()" class="px-6 py-2 bg-primary text-on-primary font-semibold rounded-lg hover:shadow-lg transition-all flex items-center gap-2">
-                                <span class="material-symbols-outlined text-sm" data-icon="play_arrow">play_arrow</span>
-                                Analyze
-                            </button>
-                            <button onclick="clearPredictionForm()" class="px-6 py-2 bg-surface-variant/20 text-primary font-semibold rounded-lg hover:bg-surface-variant/40 transition-all">
-                                Clear
-                            </button>
-                        </div>
-
-                        <div class="error hidden p-3 bg-red-50 text-red-700 rounded-lg text-sm" id="predictionError"></div>
-                        <div class="success hidden p-3 bg-green-50 text-green-700 rounded-lg text-sm" id="predictionSuccess"></div>
-                        <div class="loading hidden" id="predictionLoading">
-                            <div class="flex items-center justify-center gap-3 py-4">
-                                <div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
-                                <p class="text-sm text-on-surface-variant">Analyzing compound...</p>
-                            </div>
-                        </div>
-                        <div id="predictionResult"></div>
-                    </div>
-                </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Analysis</div>
+            <div class="nav-item active" onclick="showPanel('predict', this)">
+                <span class="nav-icon">🧪</span> Predict Compound
+            </div>
+            <div class="nav-item" onclick="showPanel('batch', this)">
+                <span class="nav-icon">⚡</span> Batch Predict
             </div>
 
-            <!-- Dataset Stats (Right 4 Cols) -->
-            <div class="lg:col-span-4 space-y-gutter">
-                <div class="glass ai-glow p-8 rounded-xl shadow-lg h-fit">
-                    <div class="flex items-center gap-3 mb-6">
-                        <span class="material-symbols-outlined text-secondary" data-icon="database">database</span>
-                        <h3 class="font-display text-xl font-semibold text-primary">Dataset</h3>
+            <div class="nav-label">Data</div>
+            <div class="nav-item" onclick="showPanel('dataset', this)">
+                <span class="nav-icon">🗄️</span> Dataset Explorer
+            </div>
+            <div class="nav-item" onclick="showPanel('benchmark', this)">
+                <span class="nav-icon">📊</span> Model Benchmark
+            </div>
+
+            <div class="nav-label">Project</div>
+            <div class="nav-item" onclick="showPanel('about', this)">
+                <span class="nav-icon">📄</span> About & Methods
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            v2.0 · Pokhara University<br>
+            BE Computer Engineering
+        </div>
+    </aside>
+
+    <!-- ── Top bar ─────────────────────────────────────────── -->
+    <header class="topbar">
+        <div class="page-title" id="pageTitle">Predict Compound</div>
+        <div class="topbar-meta">309 compounds · 12 plant species · MLP + RF ensemble</div>
+    </header>
+
+    <!-- ── Main ─────────────────────────────────────────────── -->
+    <main class="main">
+
+        <!-- PREDICT PANEL -->
+        <div class="panel-page active" id="panel-predict">
+            <div class="predict-grid">
+
+                <!-- Input card -->
+                <div class="card">
+                    <div class="card-head">
+                        <span class="card-head-icon">⚗️</span>
+                        <span class="card-head-title">Compound Input</span>
                     </div>
-                    <div id="datasetStats">
-                        <div class="space-y-4">
-                            <div class="p-4 bg-primary/5 rounded-lg border-l-4 border-primary">
-                                <div class="text-2xl font-bold text-primary">-</div>
-                                <div class="text-xs text-on-surface-variant">Total Compounds</div>
-                            </div>
-                            <div class="p-4 bg-secondary/5 rounded-lg border-l-4 border-secondary">
-                                <div class="text-2xl font-bold text-secondary">-</div>
-                                <div class="text-xs text-on-surface-variant">Active Compounds</div>
-                            </div>
-                            <div class="p-4 bg-primary-container/20 rounded-lg border-l-4 border-primary-container">
-                                <div class="text-2xl font-bold text-primary">-</div>
-                                <div class="text-xs text-on-surface-variant">Plant Sources</div>
+                    <div class="card-body">
+                        <div class="examples-strip">
+                            <div class="examples-label">Quick examples</div>
+                            <div class="examples-row">
+                                <button class="btn-example" onclick="fillExample('curcumin')">Curcumin</button>
+                                <button class="btn-example" onclick="fillExample('berberine')">Berberine</button>
+                                <button class="btn-example" onclick="fillExample('quercetin')">Quercetin</button>
+                                <button class="btn-example" onclick="fillExample('thymol')">Thymol</button>
+                                <button class="btn-example" onclick="fillExample('eugenol')">Eugenol</button>
                             </div>
                         </div>
+
+                        <div class="field" style="margin-top:16px">
+                            <label>SMILES String *</label>
+                            <textarea id="smiles" placeholder="e.g. COC1=C(C=CC(=C1)C=CC(=O)CC(=O)C=CC2=CC(=C(C=C2)O)OC)O" rows="3"></textarea>
+                        </div>
+                        <div class="field">
+                            <label>Compound Name</label>
+                            <input type="text" id="compoundName" placeholder="e.g. Curcumin">
+                        </div>
+                        <div class="field">
+                            <label>Plant Source</label>
+                            <input type="text" id="plantSource" placeholder="e.g. Curcuma longa">
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="predictSingle()">🔬 Run Prediction</button>
+                            <button class="btn btn-ghost" onclick="clearForm()">Clear</button>
+                        </div>
+                        <div class="err-msg" id="predErr"></div>
                     </div>
-                    <button onclick="loadDataset()" class="w-full mt-6 px-4 py-2 bg-secondary text-on-secondary font-semibold rounded-lg hover:shadow-lg transition-all text-sm">Load Stats</button>
+                </div>
+
+                <!-- Info card -->
+                <div class="card">
+                    <div class="card-head">
+                        <span class="card-head-icon">📐</span>
+                        <span class="card-head-title">How to Interpret</span>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size:13px;color:var(--ink-lt);line-height:1.8;margin-bottom:14px">
+                            The pipeline computes 8 physicochemical descriptors from your SMILES string
+                            and runs them through two independently trained neural networks.
+                        </p>
+                        <div class="metric-row">
+                            <span class="metric-key">Bioactivity Score</span>
+                            <span class="metric-num">P(antimicrobial active)</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-key">Toxicity Score</span>
+                            <span class="metric-num">P(toxic by heuristic)</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-key">Composite Score</span>
+                            <span class="metric-num">0.55×bio − 0.30×tox − 0.15×lip</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-key">Promising tier</span>
+                            <span class="metric-num">composite ≥ 0.55</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-key">Moderate tier</span>
+                            <span class="metric-num">0.35 – 0.55</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-key">Weak tier</span>
+                            <span class="metric-num">< 0.35</span>
+                        </div>
+                        <p style="font-size:11.5px;color:var(--stone);margin-top:14px;font-family:var(--mono)">
+                            ⚠ Computational estimate only. Not a clinical recommendation.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading-state" id="predLoading">
+                <div class="spinner"></div>
+                Running inference…
+            </div>
+
+            <!-- Result -->
+            <div class="result-block" id="resultBlock">
+                <div class="result-head">
+                    <div class="result-head-name" id="resName">—</div>
+                    <div class="tier-badge" id="resTier">—</div>
+                </div>
+                <div class="result-scores">
+                    <div class="score-cell">
+                        <div class="score-val" id="resBio">—</div>
+                        <div class="score-label">Bioactivity</div>
+                        <div class="score-bar-wrap"><div class="score-bar bar-bio" id="barBio" style="width:0%"></div></div>
+                    </div>
+                    <div class="score-cell">
+                        <div class="score-val" id="resTox">—</div>
+                        <div class="score-label">Toxicity</div>
+                        <div class="score-bar-wrap"><div class="score-bar bar-tox" id="barTox" style="width:0%"></div></div>
+                    </div>
+                    <div class="score-cell">
+                        <div class="score-val" id="resComp">—</div>
+                        <div class="score-label">Composite</div>
+                        <div class="score-bar-wrap"><div class="score-bar bar-comp" id="barComp" style="width:0%"></div></div>
+                    </div>
+                </div>
+                <div class="result-details">
+                    <div class="detail-row"><span class="detail-key">Mol. Weight</span><span class="detail-val" id="resMW">—</span></div>
+                    <div class="detail-row"><span class="detail-key">Lipinski Violations</span><span class="detail-val" id="resLip">—</span></div>
+                    <div class="detail-row"><span class="detail-key">Drug-like</span><span class="detail-val" id="resDrug">—</span></div>
+                    <div class="detail-row"><span class="detail-key">Bio Confidence</span><span class="detail-val" id="resBioConf">—</span></div>
+                </div>
+                <div class="result-rec" id="resRec">—</div>
+            </div>
+        </div>
+
+        <!-- BATCH PANEL -->
+        <div class="panel-page" id="panel-batch">
+            <div class="card" style="margin-bottom:24px">
+                <div class="card-head">
+                    <span class="card-head-icon">⚡</span>
+                    <span class="card-head-title">Batch Prediction — up to 1000 compounds</span>
+                </div>
+                <div class="card-body">
+                    <div class="field">
+                        <label>SMILES strings (one per line)</label>
+                        <textarea id="batchSmiles" rows="8" placeholder="COC1=C(C=CC(=C1)C=CC(=O)CC(=O)C=CC2=CC(=C(C=C2)O)OC)O&#10;COC1=C(C2=C[N+]3=C(C=C2C=C1)C4=CC5=C(C=C4CC3)OCO5)OC&#10;CC1=CC=C(C=C1)C(C)O"></textarea>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" onclick="predictBatch()">⚡ Run Batch</button>
+                        <button class="btn btn-ghost" onclick="document.getElementById('batchSmiles').value='';document.getElementById('batchResultWrap').innerHTML=''">Clear</button>
+                    </div>
+                    <div class="err-msg" id="batchErr"></div>
+                </div>
+            </div>
+            <div class="loading-state" id="batchLoading"><div class="spinner"></div>Processing…</div>
+            <div id="batchResultWrap"></div>
+        </div>
+
+        <!-- DATASET PANEL -->
+        <div class="panel-page" id="panel-dataset">
+            <div class="stat-row" id="datasetStats">
+                <div class="stat-card"><div class="stat-num">—</div><div class="stat-lbl">Total Compounds</div></div>
+                <div class="stat-card"><div class="stat-num">—</div><div class="stat-lbl">Active (antimicrobial)</div></div>
+                <div class="stat-card"><div class="stat-num">—</div><div class="stat-lbl">Plant Species</div></div>
+            </div>
+
+            <div class="tab-bar">
+                <button class="tab-btn active" onclick="switchTab('all', this)">All Compounds</button>
+                <button class="tab-btn" onclick="switchTab('active', this)">Active Only</button>
+            </div>
+
+            <div class="tab-pane active" id="tab-all">
+                <div class="loading-state show" id="allLoading"><div class="spinner"></div>Loading…</div>
+                <div class="tbl-wrap"><table id="tblAll" style="display:none">
+                    <thead><tr><th>Compound</th><th>Plant Source</th><th>SMILES</th><th>MW</th><th>Status</th><th></th></tr></thead>
+                    <tbody id="bodyAll"></tbody>
+                </table></div>
+            </div>
+
+            <div class="tab-pane" id="tab-active">
+                <div class="loading-state show" id="activeLoading"><div class="spinner"></div>Loading…</div>
+                <div class="tbl-wrap"><table id="tblActive" style="display:none">
+                    <thead><tr><th>Compound</th><th>Plant Source</th><th>SMILES</th><th>MW</th><th></th></tr></thead>
+                    <tbody id="bodyActive"></tbody>
+                </table></div>
+            </div>
+        </div>
+
+        <!-- BENCHMARK PANEL -->
+        <div class="panel-page" id="panel-benchmark">
+            <div class="bench-table">
+                <div class="bench-head">5-Fold Cross-Validation Results (Scaffold Split)</div>
+                <div class="bench-row header">
+                    <div>Model</div><div>Accuracy</div><div>F1-Score</div><div>ROC-AUC</div>
+                </div>
+                <div class="bench-row">
+                    <div class="bench-model">Random Forest</div>
+                    <div class="metric-val">0.862 <span class="std">±0.018</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:86.2%"></div></div></div>
+                    <div class="metric-val">0.910 <span class="std">±0.011</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:91%"></div></div></div>
+                    <div class="metric-val">0.850 <span class="std">±0.043</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:85%"></div></div></div>
+                </div>
+                <div class="bench-row">
+                    <div class="bench-model">XGBoost</div>
+                    <div class="metric-val">0.794 <span class="std">±0.016</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:79.4%"></div></div></div>
+                    <div class="metric-val">0.858 <span class="std">±0.014</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:85.8%"></div></div></div>
+                    <div class="metric-val">0.827 <span class="std">±0.048</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:82.7%"></div></div></div>
+                </div>
+                <div class="bench-row highlight">
+                    <div class="bench-model ours">MLP (ours) ★</div>
+                    <div class="metric-val">0.743 <span class="std">±0.027</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:74.3%"></div></div></div>
+                    <div class="metric-val">0.811 <span class="std">±0.021</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:81.1%"></div></div></div>
+                    <div class="metric-val">0.843 <span class="std">±0.046</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:84.3%"></div></div></div>
+                </div>
+                <div class="bench-row">
+                    <div class="bench-model">SVM (RBF)</div>
+                    <div class="metric-val">0.723 <span class="std">±0.062</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:72.3%"></div></div></div>
+                    <div class="metric-val">0.792 <span class="std">±0.051</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:79.2%"></div></div></div>
+                    <div class="metric-val">0.818 <span class="std">±0.070</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:81.8%"></div></div></div>
+                </div>
+                <div class="bench-row">
+                    <div class="bench-model">Naive Bayes</div>
+                    <div class="metric-val">0.486 <span class="std">±0.097</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:48.6%"></div></div></div>
+                    <div class="metric-val">0.540 <span class="std">±0.124</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:54%"></div></div></div>
+                    <div class="metric-val">0.675 <span class="std">±0.095</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:67.5%"></div></div></div>
+                </div>
+            </div>
+
+            <div class="info-block">
+                <h3>SHAP Feature Importance</h3>
+                <p style="font-size:13px;color:var(--ink-lt);margin-bottom:16px">Mean absolute SHAP value — contribution of each descriptor to the bioactivity prediction.</p>
+                <div id="shapBars"></div>
+            </div>
+        </div>
+
+        <!-- ABOUT PANEL -->
+        <div class="panel-page" id="panel-about">
+            <div class="about-grid">
+                <div class="info-block">
+                    <h3>Project Overview</h3>
+                    <p>An ML pipeline for antimicrobial drug discovery from Himalayan medicinal plant compounds. Predicts bioactivity and toxicity from molecular structure using descriptor-based neural networks.</p>
+                    <p>Developed as a final-year BE Computer Engineering project at Cosmos College of Management and Technology, Pokhara University.</p>
+                </div>
+                <div class="info-block">
+                    <h3>Model Performance</h3>
+                    <div class="metric-row"><span class="metric-key">Bioactivity F1 (5-fold CV)</span><span class="metric-num">0.811 ± 0.021</span></div>
+                    <div class="metric-row"><span class="metric-key">Bioactivity ROC-AUC</span><span class="metric-num">0.843 ± 0.046</span></div>
+                    <div class="metric-row"><span class="metric-key">Toxicity F1</span><span class="metric-num">0.818</span></div>
+                    <div class="metric-row"><span class="metric-key">Train set size</span><span class="metric-num">309 compounds</span></div>
+                    <div class="metric-row"><span class="metric-key">Splitting strategy</span><span class="metric-num">Bemis-Murcko scaffold</span></div>
+                </div>
+                <div class="info-block">
+                    <h3>Dataset</h3>
+                    <p>309 unique compounds from 12 Himalayan medicinal plant species, supplemented with ChEMBL antibacterial assay data (S. aureus, IC50-labelled). Deduplicated by canonical SMILES.</p>
+                    <div class="pill-list">
+                        <span class="pill">Azadirachta indica</span>
+                        <span class="pill">Curcuma longa</span>
+                        <span class="pill">Berberis aristata</span>
+                        <span class="pill">Ocimum sanctum</span>
+                        <span class="pill">Withania somnifera</span>
+                        <span class="pill">Terminalia chebula</span>
+                        <span class="pill">Zingiber officinale</span>
+                        <span class="pill">Swertia chirayita</span>
+                        <span class="pill">ChEMBL:S.aureus</span>
+                    </div>
+                </div>
+                <div class="info-block">
+                    <h3>Pipeline</h3>
+                    <div class="pill-list">
+                        <span class="pill">Python 3.13</span>
+                        <span class="pill">PyTorch</span>
+                        <span class="pill">RDKit</span>
+                        <span class="pill">scikit-learn</span>
+                        <span class="pill">SHAP</span>
+                        <span class="pill">FastAPI</span>
+                        <span class="pill">ChEMBL REST API</span>
+                        <span class="pill">XGBoost</span>
+                    </div>
+                    <p style="margin-top:14px;font-size:13px;color:var(--stone);font-family:var(--mono)">
+                        github.com/deepalsr/himalayan-herbal-ai
+                    </p>
+                </div>
+                <div class="info-block full-span">
+                    <h3>Key Finding</h3>
+                    <p>SHAP analysis reveals that <strong>molecular weight</strong> and <strong>hydrogen bond donors</strong> are the primary drivers of predicted antimicrobial activity, consistent with the structural complexity of natural product antibiotics. Notably, Lipinski violations contributed least — suggesting classical drug-likeness rules are poor proxies for antimicrobial activity, a finding consistent with known antibiotics that frequently violate the Rule of Five.</p>
+                    <p>Scaffold-based evaluation reveals all models drop in ROC-AUC when tested on unseen scaffolds (~0.45–0.60 vs ~0.85 in random splits), motivating future graph-based representations (GAT) that may generalise beyond scaffold-level patterns.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Batch Prediction Section -->
-        <div class="glass p-8 rounded-xl shadow-lg mb-section-gap" id="batch">
-            <div class="flex items-center gap-3 mb-6">
-                <span class="material-symbols-outlined text-secondary" data-icon="send">send</span>
-                <h2 class="font-display text-2xl font-semibold text-primary">Batch Processing</h2>
-                <span class="px-3 py-1 bg-secondary-container/20 text-secondary rounded-full text-xs font-semibold">Up to 1000</span>
-            </div>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-on-surface mb-2">Enter Multiple SMILES (one per line)</label>
-                    <textarea id="batchSmiles" class="w-full p-3 bg-surface-variant/5 border border-surface-variant rounded-lg font-mono text-sm focus:ring-1 focus:ring-secondary focus:border-transparent transition-all" placeholder="CC(=O)Cc1ccc(O)c(O)cc1
-c1ccc(O)c(O)c1
-CC(C)Cc1ccc(cc1)C(C)C(O)=O" rows="6"></textarea>
-                </div>
-
-                <div class="flex gap-3">
-                    <button onclick="predictBatch()" class="px-6 py-2 bg-primary text-on-primary font-semibold rounded-lg hover:shadow-lg transition-all flex items-center gap-2">
-                        <span class="material-symbols-outlined text-sm" data-icon="play_arrow">play_arrow</span>
-                        Process Batch
-                    </button>
-                    <button onclick="clearBatchForm()" class="px-6 py-2 bg-surface-variant/20 text-primary font-semibold rounded-lg hover:bg-surface-variant/40 transition-all">
-                        Clear
-                    </button>
-                </div>
-
-                <div class="error hidden p-3 bg-red-50 text-red-700 rounded-lg text-sm" id="batchError"></div>
-                <div class="loading hidden" id="batchLoading">
-                    <div class="flex items-center justify-center gap-3 py-4">
-                        <div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
-                        <p class="text-sm text-on-surface-variant">Processing batch predictions...</p>
-                    </div>
-                </div>
-                <div id="batchResult"></div>
-            </div>
-        </div>
-
-        <!-- Dataset Explorer -->
-        <div class="glass p-8 rounded-xl shadow-lg" id="explorer">
-            <div class="flex items-center gap-3 mb-6">
-                <span class="material-symbols-outlined text-secondary" data-icon="explore">explore</span>
-                <h2 class="font-display text-2xl font-semibold text-primary">Compound Database</h2>
-            </div>
-
-            <div class="flex gap-2 mb-6 border-b border-surface-variant/30">
-                <button class="tab-button active px-4 py-3 font-semibold text-sm text-primary border-b-2 border-primary transition-all" onclick="switchTab(event, 'compounds')">
-                    All Compounds
-                </button>
-                <button class="tab-button px-4 py-3 font-semibold text-sm text-on-surface-variant hover:text-primary transition-all" onclick="switchTab(event, 'active')">
-                    Active Only
-                </button>
-                <button class="tab-button px-4 py-3 font-semibold text-sm text-on-surface-variant hover:text-primary transition-all" onclick="switchTab(event, 'history')">
-                    Prediction History
-                </button>
-            </div>
-
-            <!-- All Compounds Tab -->
-            <div id="compounds" class="tab-content active">
-                <div class="loading" id="compoundsLoading">
-                    <div class="flex items-center justify-center gap-3 py-8">
-                        <div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
-                        <p class="text-sm text-on-surface-variant">Loading compounds...</p>
-                    </div>
-                </div>
-                <div class="overflow-x-auto hidden" id="compoundsTableWrapper">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-surface-variant">
-                                <th class="text-left py-3 px-4 font-semibold text-on-surface">Compound</th>
-                                <th class="text-left py-3 px-4 font-semibold text-on-surface">Plant Source</th>
-                                <th class="text-center py-3 px-4 font-semibold text-on-surface">MW</th>
-                                <th class="text-center py-3 px-4 font-semibold text-on-surface">Active</th>
-                                <th class="text-center py-3 px-4 font-semibold text-on-surface">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="compoundsTableBody" class="divide-y divide-surface-variant/30"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Active Compounds Tab -->
-            <div id="active" class="tab-content hidden">
-                <div class="loading" id="activeLoading">
-                    <div class="flex items-center justify-center gap-3 py-8">
-                        <div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
-                        <p class="text-sm text-on-surface-variant">Loading active compounds...</p>
-                    </div>
-                </div>
-                <div class="overflow-x-auto hidden" id="activeTableWrapper">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-surface-variant">
-                                <th class="text-left py-3 px-4 font-semibold text-on-surface">Compound</th>
-                                <th class="text-left py-3 px-4 font-semibold text-on-surface">Plant Source</th>
-                                <th class="text-center py-3 px-4 font-semibold text-on-surface">MW</th>
-                                <th class="text-center py-3 px-4 font-semibold text-on-surface">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="activeTableBody" class="divide-y divide-surface-variant/30"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- History Tab -->
-            <div id="history" class="tab-content hidden">
-                <div id="historyContent" class="text-center py-8 text-on-surface-variant">
-                    <span class="material-symbols-outlined text-4xl mb-2 opacity-50">history</span>
-                    <p>No predictions yet</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</main>
+    </main>
+</div>
 
 <script>
-    const API_URL = '/api';
+const API = '/api';   // Prefix for Flask backend routes
 
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
-        checkHealth();
-        setInterval(checkHealth, 30000);
-    });
+const EXAMPLES = {
+    curcumin:  { smiles: 'COC1=C(C=CC(=C1)C=CC(=O)CC(=O)C=CC2=CC(=C(C=C2)O)OC)O', name: 'Curcumin',  source: 'Curcuma longa' },
+    berberine: { smiles: 'COC1=C(C2=C[N+]3=C(C=C2C=C1)C4=CC5=C(C=C4CC3)OCO5)OC',   name: 'Berberine', source: 'Berberis aristata' },
+    quercetin: { smiles: 'C1=CC(=C(C=C1C2=C(C(=O)C3=C(C=C(C=C3O2)O)O)O)O)O',        name: 'Quercetin', source: 'Azadirachta indica' },
+    thymol:    { smiles: 'CC1=CC=C(C=C1)C(C)O',                                       name: 'Thymol',    source: 'Thymus linearis' },
+    eugenol:   { smiles: 'CC=CC1=CC(=C(C=C1)O)OC',                                    name: 'Eugenol',   source: 'Ocimum sanctum' },
+};
 
-    // Health check
-    async function checkHealth() {
-        try {
-            const response = await fetch(`${API_URL}/health`);
-            if (response.ok) {
-                document.getElementById('statusText').textContent = 'Connected';
-            } else {
-                document.getElementById('statusText').textContent = 'API Error';
-            }
-        } catch {
-            document.getElementById('statusText').textContent = 'Offline';
-        }
+const SHAP = [
+    { name: 'Molecular Weight', val: 0.1015 },
+    { name: 'H-Bond Donors',    val: 0.0908 },
+    { name: 'TPSA',             val: 0.0723 },
+    { name: 'LogP',             val: 0.0710 },
+    { name: 'Rotatable Bonds',  val: 0.0471 },
+    { name: 'Aromatic Rings',   val: 0.0321 },
+    { name: 'H-Bond Acceptors', val: 0.0257 },
+    { name: 'Lipinski Viol.',   val: 0.0163 },
+];
+
+// ── Init ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    checkHealth();
+    setInterval(checkHealth, 30000);
+    loadDataset();
+    buildShapBars();
+});
+
+// ── Health ────────────────────────────────────────────────────
+async function checkHealth() {
+    try {
+        const r = await fetch(`${API}/health`);
+        const d = await r.json();
+        setDot('apiDot', 'apiStatus', r.ok, r.ok ? 'API connected' : 'API error');
+        setDot('bioDot', 'bioStatus', d.models_loaded?.bioactivity, 'Bioactivity model ' + (d.models_loaded?.bioactivity ? 'loaded' : 'not loaded'));
+        setDot('toxDot', 'toxStatus', d.models_loaded?.toxicity,    'Toxicity model '    + (d.models_loaded?.toxicity    ? 'loaded' : 'not loaded'));
+    } catch {
+        setDot('apiDot', 'apiStatus', false, 'API offline');
+        setDot('bioDot', 'bioStatus', false, 'Bioactivity model —');
+        setDot('toxDot', 'toxStatus', false, 'Toxicity model —');
     }
+}
 
-    // Predict single
-    async function predictSingle() {
-        const smiles = document.getElementById('smiles').value.trim();
-        if (!smiles) {
-            showError('predictionError', 'SMILES string is required');
-            return;
-        }
+function setDot(dotId, textId, ok, text) {
+    document.getElementById(dotId).className = 'status-dot ' + (ok ? 'live' : 'err');
+    document.getElementById(textId).textContent = text;
+}
 
-        const data = {
-            smiles: smiles,
-            compound_name: document.getElementById('compoundName').value || 'Unknown',
-            plant_source: document.getElementById('plantSource').value || 'Unknown'
-        };
+// ── Panel switching ───────────────────────────────────────────
+function showPanel(name, el) {
+    document.querySelectorAll('.panel-page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    el.classList.add('active');
+    const titles = { predict:'Predict Compound', batch:'Batch Prediction', dataset:'Dataset Explorer', benchmark:'Model Benchmark', about:'About & Methods' };
+    document.getElementById('pageTitle').textContent = titles[name] || name;
+}
 
-        showLoading('predictionLoading', true);
-        hideError('predictionError');
+// ── Examples ──────────────────────────────────────────────────
+function fillExample(key) {
+    const e = EXAMPLES[key];
+    document.getElementById('smiles').value       = e.smiles;
+    document.getElementById('compoundName').value  = e.name;
+    document.getElementById('plantSource').value   = e.source;
+}
 
-        try {
-            const response = await fetch(`${API_URL}/predict`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+// ── Predict single ────────────────────────────────────────────
+async function predictSingle() {
+    const smiles = document.getElementById('smiles').value.trim();
+    if (!smiles) { showErr('predErr', 'SMILES string is required'); return; }
+    hideErr('predErr');
 
-            if (!response.ok) throw new Error('Prediction failed');
-            const result = await response.json();
-            displayPredictionResult(result);
-            showSuccess('predictionSuccess', 'Analysis successful!');
-        } catch (error) {
-            showError('predictionError', error.message);
-        } finally {
-            showLoading('predictionLoading', false);
-        }
-    }
+    document.getElementById('predLoading').classList.add('show');
+    document.getElementById('resultBlock').classList.remove('show');
 
-    // Display prediction result
-    function displayPredictionResult(result) {
-        const bioactivity = (result.bioactivity_prediction * 100).toFixed(1);
-        const toxicity = (result.toxicity_prediction * 100).toFixed(1);
-        
-        let riskColor = 'bg-green-50 border-l-4 border-green-500';
-        let riskLabel = '✅ Promising';
-        
-        if (toxicity > 70) {
-            riskColor = 'bg-red-50 border-l-4 border-red-500';
-            riskLabel = '⚠️ High Risk';
-        } else if (toxicity > 50) {
-            riskColor = 'bg-yellow-50 border-l-4 border-yellow-500';
-            riskLabel = '⚠️ Moderate Risk';
-        }
-
-        const html = `
-            <div class="${riskColor} p-4 rounded-lg mt-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <div class="text-xs text-on-surface-variant">Bioactivity</div>
-                        <div class="text-2xl font-bold text-primary">${bioactivity}%</div>
-                    </div>
-                    <div>
-                        <div class="text-xs text-on-surface-variant">Toxicity</div>
-                        <div class="text-2xl font-bold text-error">${toxicity}%</div>
-                    </div>
-                </div>
-                <div class="mt-3 p-2 bg-white rounded text-center font-semibold text-primary">${riskLabel}</div>
-            </div>
-        `;
-        
-        document.getElementById('predictionResult').innerHTML = html;
-    }
-
-    // Batch predict
-    async function predictBatch() {
-        const batchText = document.getElementById('batchSmiles').value.trim();
-        if (!batchText) {
-            showError('batchError', 'Enter at least one SMILES string');
-            return;
-        }
-
-        const smiles = batchText.split('\n').filter(s => s.trim()).map(s => ({
-            smiles: s.trim()
-        }));
-
-        if (smiles.length > 1000) {
-            showError('batchError', 'Maximum 1000 compounds per batch');
-            return;
-        }
-
-        showLoading('batchLoading', true);
-        hideError('batchError');
-
-        try {
-            const response = await fetch(`${API_URL}/batch-predict`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(smiles)
-            });
-
-            if (!response.ok) throw new Error('Batch prediction failed');
-            const result = await response.json();
-            displayBatchResults(result.predictions);
-        } catch (error) {
-            showError('batchError', error.message);
-        } finally {
-            showLoading('batchLoading', false);
-        }
-    }
-
-    // Display batch results
-    function displayBatchResults(predictions) {
-        let html = '<div class="overflow-x-auto mt-4"><table class="w-full text-sm"><thead><tr class="border-b border-surface-variant"><th class="text-left py-3 px-4 font-semibold">Compound</th><th class="text-center py-3 px-4 font-semibold">Bioactivity</th><th class="text-center py-3 px-4 font-semibold">Toxicity</th><th class="text-center py-3 px-4 font-semibold">Status</th></tr></thead><tbody class="divide-y divide-surface-variant/30">';
-        
-        predictions.forEach(pred => {
-            const bioactivity = (pred.bioactivity_prediction * 100).toFixed(1);
-            const toxicity = (pred.toxicity_prediction * 100).toFixed(1);
-            const status = toxicity > 70 ? '⚠️ High' : toxicity > 50 ? '⚠️ Medium' : '✅ Good';
-            
-            html += `<tr><td class="py-3 px-4">${pred.compound_name || 'Compound'}</td><td class="text-center py-3 px-4">${bioactivity}%</td><td class="text-center py-3 px-4">${toxicity}%</td><td class="text-center py-3 px-4">${status}</td></tr>`;
+    try {
+        const r = await fetch(`${API}/predict`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                smiles,
+                compound_name: document.getElementById('compoundName').value || 'Unknown',
+                plant_source:  document.getElementById('plantSource').value  || 'Unknown',
+            })
         });
-        
-        html += '</tbody></table></div>';
-        document.getElementById('batchResult').innerHTML = html;
-    }
+        if (!r.ok) { const e = await r.json(); throw new Error(e.detail || 'Prediction failed'); }
+        displayResult(await r.json());
+    } catch(e) { showErr('predErr', e.message); }
+    finally    { document.getElementById('predLoading').classList.remove('show'); }
+}
 
-    // Load dataset
-    async function loadDataset() {
-        try {
-            const response = await fetch(`${API_URL}/dataset`);
-            const data = await response.json();
-            
-            const stats = `
-                <div class="space-y-4">
-                    <div class="p-4 bg-primary/5 rounded-lg border-l-4 border-primary">
-                        <div class="text-2xl font-bold text-primary">${data.total_compounds}</div>
-                        <div class="text-xs text-on-surface-variant">Total Compounds</div>
-                    </div>
-                    <div class="p-4 bg-secondary/5 rounded-lg border-l-4 border-secondary">
-                        <div class="text-2xl font-bold text-secondary">${data.active_compounds}</div>
-                        <div class="text-xs text-on-surface-variant">Active Compounds</div>
-                    </div>
-                    <div class="p-4 bg-primary-container/20 rounded-lg border-l-4 border-primary-container">
-                        <div class="text-2xl font-bold text-primary">${data.plant_sources}</div>
-                        <div class="text-xs text-on-surface-variant">Plant Sources</div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('datasetStats').innerHTML = stats;
-            loadCompoundsTable(false);
-        } catch (error) {
-            console.error('Failed to load dataset:', error);
+function displayResult(d) {
+    const bio  = d.bioactivity_prediction;
+    const tox  = d.toxicity_prediction;
+    const comp = d.composite_score;
+
+    document.getElementById('resName').textContent = d.compound_name;
+
+    const tierEl = document.getElementById('resTier');
+    if (comp >= 0.55)      { tierEl.textContent = 'Promising';  tierEl.className = 'tier-badge tier-promising'; }
+    else if (comp >= 0.35) { tierEl.textContent = 'Moderate';   tierEl.className = 'tier-badge tier-moderate'; }
+    else                   { tierEl.textContent = 'Weak';       tierEl.className = 'tier-badge tier-weak'; }
+
+    const bioEl = document.getElementById('resBio');
+    bioEl.textContent = (bio * 100).toFixed(1) + '%';
+    bioEl.className = 'score-val ' + (bio >= 0.6 ? 'good' : bio >= 0.4 ? 'warn' : 'bad');
+    document.getElementById('barBio').style.width = (bio * 100) + '%';
+
+    const toxEl = document.getElementById('resTox');
+    toxEl.textContent = (tox * 100).toFixed(1) + '%';
+    toxEl.className = 'score-val ' + (tox < 0.3 ? 'good' : tox < 0.6 ? 'warn' : 'bad');
+    document.getElementById('barTox').style.width = (tox * 100) + '%';
+
+    const compEl = document.getElementById('resComp');
+    compEl.textContent = comp.toFixed(3);
+    compEl.className = 'score-val ' + (comp >= 0.55 ? 'good' : comp >= 0.35 ? 'warn' : 'bad');
+    document.getElementById('barComp').style.width = (comp * 100) + '%';
+
+    document.getElementById('resMW').textContent      = '—';
+    document.getElementById('resLip').textContent     = d.lipinski_violations + ' / 4';
+    document.getElementById('resDrug').textContent    = d.drug_like ? 'Yes ✓' : 'No ✗';
+    document.getElementById('resBioConf').textContent = (d.bioactivity_confidence * 100).toFixed(1) + '%';
+    document.getElementById('resRec').textContent     = d.recommendation;
+
+    document.getElementById('resultBlock').classList.add('show');
+    document.getElementById('resultBlock').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── Batch predict ─────────────────────────────────────────────
+async function predictBatch() {
+    const raw = document.getElementById('batchSmiles').value.trim();
+    if (!raw) { showErr('batchErr', 'Enter at least one SMILES'); return; }
+    hideErr('batchErr');
+
+    const compounds = raw.split('\n').filter(s => s.trim()).map((s, i) => ({
+        smiles: s.trim(), compound_name: `Compound ${i+1}`
+    }));
+
+    if (compounds.length > 1000) { showErr('batchErr', 'Max 1000 compounds'); return; }
+
+    document.getElementById('batchLoading').classList.add('show');
+    document.getElementById('batchResultWrap').innerHTML = '';
+
+    try {
+        const r = await fetch(`${API}/batch-predict`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(compounds),
+        });
+        if (!r.ok) throw new Error('Batch failed');
+        const data = await r.json();
+        renderBatchResults(data.predictions);
+    } catch(e) { showErr('batchErr', e.message); }
+    finally    { document.getElementById('batchLoading').classList.remove('show'); }
+}
+
+function renderBatchResults(preds) {
+    let html = `<div style="background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+    <div class="batch-result-row header">
+        <div>SMILES / Name</div><div>Bioactivity</div><div>Toxicity</div><div>Composite</div><div>Tier</div>
+    </div>`;
+    preds.forEach(p => {
+        if (p.error) {
+            html += `<div class="batch-result-row"><div style="font-family:var(--mono);font-size:11px;color:var(--stone)">${p.compound_name}</div><div colspan="4" style="color:var(--red);font-size:12px">Error: ${p.error}</div></div>`;
+            return;
         }
-    }
+        const comp = p.composite_score;
+        const tier = comp >= 0.55 ? '<span class="badge badge-active">Promising</span>'
+                   : comp >= 0.35 ? '<span class="badge" style="background:#fef3c7;color:#92400e">Moderate</span>'
+                   :                '<span class="badge badge-inactive">Weak</span>';
+        html += `<div class="batch-result-row">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--stone)">${p.compound_name}</div>
+            <div style="font-family:var(--mono)">${(p.bioactivity_prediction*100).toFixed(1)}%</div>
+            <div style="font-family:var(--mono)">${(p.toxicity_prediction*100).toFixed(1)}%</div>
+            <div style="font-family:var(--mono)">${comp.toFixed(3)}</div>
+            <div>${tier}</div>
+        </div>`;
+    });
+    html += '</div>';
+    document.getElementById('batchResultWrap').innerHTML = html;
+}
 
-    // Load compounds table
-    async function loadCompoundsTable(activeOnly) {
-        const params = new URLSearchParams({ limit: 100, active_only: activeOnly });
+// ── Dataset ───────────────────────────────────────────────────
+async function loadDataset() {
+    try {
+        const r = await fetch(`${API}/dataset`);
+        const d = await r.json();
+        document.getElementById('datasetStats').innerHTML = `
+            <div class="stat-card"><div class="stat-num">${d.total_compounds}</div><div class="stat-lbl">Total Compounds</div></div>
+            <div class="stat-card"><div class="stat-num">${d.active_compounds}</div><div class="stat-lbl">Active (antimicrobial)</div></div>
+            <div class="stat-card"><div class="stat-num">${d.plant_sources}</div><div class="stat-lbl">Plant Species</div></div>
+        `;
+        loadTable(false);
+    } catch(e) { console.error(e); }
+}
 
-        try {
-            const response = await fetch(`${API_URL}/compounds?${params}`);
-            const data = await response.json();
-            
-            const loaderId = activeOnly ? 'activeLoading' : 'compoundsLoading';
-            const tableId = activeOnly ? 'activeTableBody' : 'compoundsTableBody';
-            const wrapperId = activeOnly ? 'activeTableWrapper' : 'compoundsTableWrapper';
-            
-            let html = '';
-            data.compounds.forEach(compound => {
-                const mw = compound.molecular_weight ? compound.molecular_weight.toFixed(1) : 'N/A';
-                const active = compound.antimicrobial_active ? '✓' : '✗';
-                
-                html += `<tr class="hover:bg-surface-variant/5"><td class="py-3 px-4">${compound.compound_name}</td><td class="py-3 px-4">${compound.plant_source}</td><td class="text-center py-3 px-4">${mw}</td><td class="text-center py-3 px-4">${activeOnly ? '' : active}</td><td class="text-center py-3 px-4"><button class="px-2 py-1 text-xs bg-secondary/10 text-secondary rounded hover:bg-secondary/20 transition-all" onclick="useSMILES('${compound.smiles}')">Use</button></td></tr>`;
-            });
+async function loadTable(activeOnly) {
+    const loadId = activeOnly ? 'activeLoading' : 'allLoading';
+    const tblId  = activeOnly ? 'tblActive'     : 'tblAll';
+    const bodyId = activeOnly ? 'bodyActive'    : 'bodyAll';
+    document.getElementById(loadId).classList.add('show');
+    try {
+        const r = await fetch(`${API}/compounds?limit=200&active_only=${activeOnly}`);
+        const d = await r.json();
+        let html = '';
+        d.compounds.forEach(c => {
+            const mw = c.molecular_weight ? Number(c.molecular_weight).toFixed(1) : '—';
+            const badge = c.antimicrobial_active
+                ? '<span class="badge badge-active">Active</span>'
+                : '<span class="badge badge-inactive">Inactive</span>';
+            html += `<tr>
+                <td><strong>${c.compound_name || '—'}</strong></td>
+                <td style="font-size:12px;color:var(--stone)">${c.plant_source || '—'}</td>
+                <td class="smiles-cell" title="${c.smiles}">${c.smiles}</td>
+                <td style="font-family:var(--mono);font-size:12px">${mw}</td>
+                ${activeOnly ? '' : `<td>${badge}</td>`}
+                <td><button class="btn-example" onclick="useSMILES('${c.smiles}','${c.compound_name || ''}','${c.plant_source || ''}')">Use</button></td>
+            </tr>`;
+        });
+        document.getElementById(bodyId).innerHTML = html;
+        document.getElementById(tblId).style.display = 'table';
+    } catch(e) { console.error(e); }
+    finally { document.getElementById(loadId).classList.remove('show'); }
+}
 
-            document.getElementById(tableId).innerHTML = html;
-            document.getElementById(wrapperId).classList.remove('hidden');
-            document.getElementById(loaderId).classList.add('hidden');
-        } catch (error) {
-            console.error('Failed to load compounds:', error);
-        }
-    }
+function useSMILES(smiles, name, source) {
+    document.getElementById('smiles').value      = smiles;
+    document.getElementById('compoundName').value = name;
+    document.getElementById('plantSource').value  = source;
+    showPanel('predict', document.querySelector('.nav-item'));
+    document.querySelectorAll('.nav-item')[0].classList.add('active');
+    document.querySelectorAll('.nav-item').forEach((n,i) => { if(i>0) n.classList.remove('active'); });
+    document.getElementById('pageTitle').textContent = 'Predict Compound';
+}
 
-    // Use SMILES
-    function useSMILES(smiles) {
-        document.getElementById('smiles').value = smiles;
-        document.getElementById('smiles').scrollIntoView({ behavior: 'smooth' });
-    }
+function switchTab(which, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + which).classList.add('active');
+    if (which === 'active') loadTable(true);
+}
 
-    // Switch tab
-    function switchTab(event, tabName) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('border-b-2', 'border-primary', 'text-primary'));
-        
-        document.getElementById(tabName).classList.remove('hidden');
-        event.target.classList.add('border-b-2', 'border-primary', 'text-primary');
+// ── SHAP bars ─────────────────────────────────────────────────
+function buildShapBars() {
+    const max = SHAP[0].val;
+    let html = '';
+    SHAP.forEach(f => {
+        const pct = (f.val / max * 100).toFixed(1);
+        html += `<div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                <span style="color:var(--ink-lt)">${f.name}</span>
+                <span style="font-family:var(--mono);color:var(--stone)">${f.val.toFixed(4)}</span>
+            </div>
+            <div style="height:6px;background:var(--parchment);border-radius:3px">
+                <div style="height:100%;width:${pct}%;background:var(--sage);border-radius:3px;transition:width 0.6s ease"></div>
+            </div>
+        </div>`;
+    });
+    document.getElementById('shapBars').innerHTML = html;
+}
 
-        if (tabName === 'compounds') loadCompoundsTable(false);
-        else if (tabName === 'active') loadCompoundsTable(true);
-        else if (tabName === 'history') loadHistory();
-    }
+// ── Utils ─────────────────────────────────────────────────────
+function clearForm() {
+    ['smiles','compoundName','plantSource'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('resultBlock').classList.remove('show');
+    hideErr('predErr');
+}
 
-    // Load history
-    async function loadHistory() {
-        try {
-            const response = await fetch(`${API_URL}/history`);
-            const data = await response.json();
-
-            if (data.count === 0) {
-                document.getElementById('historyContent').innerHTML = '<p class="text-on-surface-variant">No predictions yet</p>';
-                return;
-            }
-
-            let html = '';
-            data.predictions.forEach(item => {
-                const pred = item.prediction;
-                const bioactivity = (pred.bioactivity_prediction * 100).toFixed(1);
-                const toxicity = (pred.toxicity_prediction * 100).toFixed(1);
-                
-                html += `<div class="p-4 bg-surface-variant/5 rounded-lg mb-2"><div class="flex justify-between"><div><div class="font-semibold text-primary">${pred.compound_name}</div><div class="text-xs text-on-surface-variant">Bioactivity: ${bioactivity}% | Toxicity: ${toxicity}%</div></div></div></div>`;
-            });
-
-            document.getElementById('historyContent').innerHTML = html;
-        } catch (error) {
-            console.error('Failed to load history:', error);
-        }
-    }
-
-    // Utilities
-    function showError(id, message) {
-        const elem = document.getElementById(id);
-        elem.textContent = message;
-        elem.classList.remove('hidden');
-    }
-
-    function hideError(id) {
-        document.getElementById(id).classList.add('hidden');
-    }
-
-    function showSuccess(id, message) {
-        const elem = document.getElementById(id);
-        elem.textContent = message;
-        elem.classList.remove('hidden');
-        setTimeout(() => elem.classList.add('hidden'), 3000);
-    }
-
-    function showLoading(id, show) {
-        document.getElementById(id).classList.toggle('hidden', !show);
-    }
-
-    function clearPredictionForm() {
-        document.getElementById('smiles').value = '';
-        document.getElementById('compoundName').value = '';
-        document.getElementById('plantSource').value = '';
-        document.getElementById('predictionResult').innerHTML = '';
-    }
-
-    function clearBatchForm() {
-        document.getElementById('batchSmiles').value = '';
-        document.getElementById('batchResult').innerHTML = '';
-    }
+function showErr(id, msg) { const e = document.getElementById(id); e.textContent = msg; e.classList.add('show'); }
+function hideErr(id)       { document.getElementById(id).classList.remove('show'); }
 </script>
 </body>
 </html>

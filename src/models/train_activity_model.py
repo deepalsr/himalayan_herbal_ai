@@ -112,6 +112,7 @@ class ActivityModelTrainer:
         self.model = None
         self.scaler = StandardScaler()
         self.history = {'train_loss': [], 'val_loss': [], 'val_acc': []}
+        self.class_weights = None   # set during prepare_data
         self.best_model_path = os.path.join(output_dir, 'best_model.pth')
         
         print(f"🔧 ActivityModelTrainer initialized")
@@ -197,50 +198,51 @@ class ActivityModelTrainer:
         
         return np.column_stack(features)
     
-    def prepare_data(self, X: np.ndarray, y: np.ndarray, 
-                    test_size: float = 0.2, val_size: float = 0.1):
+    def prepare_data(self, X: np.ndarray, y: np.ndarray,
+                     test_size: float = 0.2, val_size: float = 0.1):
         """
-        Split and normalize data
-        
-        Returns:
-            Train, validation, and test datasets
+        Stratified split that preserves class ratios in every subset.
+        Also computes class weights for the loss function so the minority
+        class (inactive compounds) is not ignored during training.
         """
-        print("\n📊 Preparing data...")
-        
-        # Split into train+val and test
-        X_temp, X_test, y_temp, y_test = train_test_split(
-            X, y, test_size=test_size, random_state=42, stratify=y
-        )
-        
-        # Split train+val into train and val
-        val_size_adjusted = val_size / (1 - test_size)
-        X_train, X_val, y_train, y_val = train_test_split(
-            X_temp, y_temp, test_size=val_size_adjusted, random_state=42, stratify=y_temp
-        )
-        
-        # Normalize features
+        from sklearn.model_selection import StratifiedShuffleSplit
+
+        print("\n📊 Preparing data (stratified split)...")
+
+        # First split: hold out test set
+        sss_test = StratifiedShuffleSplit(n_splits=1, test_size=test_size, random_state=42)
+        train_val_idx, test_idx = next(sss_test.split(X, y))
+        X_temp, y_temp = X[train_val_idx], y[train_val_idx]
+        X_test, y_test = X[test_idx],      y[test_idx]
+
+        # Second split: carve validation out of train
+        val_size_adj = val_size / (1 - test_size)
+        sss_val = StratifiedShuffleSplit(n_splits=1, test_size=val_size_adj, random_state=42)
+        train_idx, val_idx = next(sss_val.split(X_temp, y_temp))
+        X_train, y_train = X_temp[train_idx], y_temp[train_idx]
+        X_val,   y_val   = X_temp[val_idx],   y_temp[val_idx]
+
+        # Scale
         X_train = self.scaler.fit_transform(X_train)
-        X_val = self.scaler.transform(X_val)
-        X_test = self.scaler.transform(X_test)
-        
-        print(f"✅ Data splits:")
-        print(f"   Train: {X_train.shape[0]} samples ({y_train.sum()} active)")
-        print(f"   Val:   {X_val.shape[0]} samples ({y_val.sum()} active)")
-        print(f"   Test:  {X_test.shape[0]} samples ({y_test.sum()} active)")
-        
-        # Convert to tensors
-        X_train_t = torch.FloatTensor(X_train).to(self.device)
-        y_train_t = torch.LongTensor(y_train).to(self.device)
-        X_val_t = torch.FloatTensor(X_val).to(self.device)
-        y_val_t = torch.LongTensor(y_val).to(self.device)
-        X_test_t = torch.FloatTensor(X_test).to(self.device)
-        y_test_t = torch.LongTensor(y_test).to(self.device)
-        
-        return (
-            (X_train_t, y_train_t), 
-            (X_val_t, y_val_t), 
-            (X_test_t, y_test_t)
-        )
+        X_val   = self.scaler.transform(X_val)
+        X_test  = self.scaler.transform(X_test)
+
+        # Class weights: inverse frequency, so minority class gets more loss signal
+        n_neg = (y_train == 0).sum()
+        n_pos = (y_train == 1).sum()
+        self.class_weights = torch.FloatTensor([
+            len(y_train) / (2 * n_neg) if n_neg > 0 else 1.0,
+            len(y_train) / (2 * n_pos) if n_pos > 0 else 1.0,
+        ]).to(self.device)
+
+        print(f"✅ Splits — Train: {len(y_train)} | Val: {len(y_val)} | Test: {len(y_test)}")
+        print(f"   Train balance: {n_pos} active / {n_neg} inactive")
+        print(f"   Class weights: neg={self.class_weights[0]:.2f}, pos={self.class_weights[1]:.2f}")
+
+        # Tensors
+        to_t = lambda arr: torch.FloatTensor(arr).to(self.device)
+        to_l = lambda arr: torch.LongTensor(arr).to(self.device)
+        return (to_t(X_train), to_l(y_train)), (to_t(X_val), to_l(y_val)), (to_t(X_test), to_l(y_test))
     
     def create_model(self, input_size: int, hidden_sizes: List[int] = None) -> BioactivityPredictor:
         """Create the model"""
@@ -292,7 +294,7 @@ class ActivityModelTrainer:
         train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
         
         # Loss and optimizer
-        criterion = nn.CrossEntropyLoss()
+        criterion = nn.CrossEntropyLoss(weight=self.class_weights)
         optimizer = optim.Adam(self.model.parameters(), 
                               lr=learning_rate, 
                               weight_decay=weight_decay)
@@ -514,7 +516,7 @@ def main():
     
     # Initialize trainer
     trainer = ActivityModelTrainer(
-        data_path="data/himalayan_antimicrobial_compounds.csv",
+        data_path="src/data/data/himalayan_antimicrobial_compounds.csv",  # ← add src/
         output_dir="models/bioactivity"
     )
     

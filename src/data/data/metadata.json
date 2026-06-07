@@ -1,7 +1,7 @@
 {
-  "collection_date": "2026-02-07T14:27:03.498399",
-  "total_compounds": 34,
-  "active_compounds": 28,
+  "collection_date": "2026-06-07T12:36:29.206486",
+  "total_compounds": 309,
+  "active_compounds": 237,
   "plant_sources": [
     "Azadirachta indica",
     "Curcuma longa",
@@ -15,15 +15,21 @@
     "Swertia chirayita",
     "Thymus linearis",
     "Juniperus communis",
-    "Various"
+    "ChEMBL:S.aureus"
   ],
-  "data_source": "Hybrid: Built-in dataset + PubChem",
+  "data_sources": [
+    "built-in",
+    "ChEMBL:S.aureus",
+    "PubChem:similarity"
+  ],
   "features": [
     "compound_name",
     "smiles",
     "plant_source",
     "molecular_weight",
     "antimicrobial_active",
+    "reference_doi",
+    "pic50",
     "logp",
     "tpsa",
     "hbd",
@@ -34,6 +40,7 @@
     "lipinski_logp",
     "lipinski_hbd",
     "lipinski_hba",
-    "lipinski_violations"
+    "lipinski_violations",
+    "canonical_smiles"
   ]
 }
