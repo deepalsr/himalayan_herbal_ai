@@ -8,6 +8,7 @@ dataset at startup (since no .pkl was persisted after training).
 
 import json
 import pickle
+import joblib
 import numpy as np
 import torch
 import torch.nn as nn
@@ -77,10 +78,12 @@ app.add_middleware(
 # ── Global inference state ─────────────────────────────────────────────────
 
 _state: Dict = {
-    "bio_model":  None,
-    "tox_model":  None,
+    "bio_model":  None,   # MLP
+    "tox_model":  None,   # MLP
     "bio_scaler": None,
     "tox_scaler": None,
+    "rf_model":   None,   # Random Forest (primary)
+    "rf_scaler":  None,
     "device":     "cpu",
 }
 
@@ -143,12 +146,23 @@ async def startup_event():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     _state["device"] = device
 
+    # MLP models
     _state["bio_model"] = _load_model(BIO_MODEL_PATH, BIO_CONFIG_PATH, device)
     _state["tox_model"] = _load_model(TOX_MODEL_PATH, TOX_CONFIG_PATH, device)
 
     scaler = _fit_scaler_from_dataset()
     _state["bio_scaler"] = scaler
-    _state["tox_scaler"] = scaler   # same scaler — both models use identical features
+    _state["tox_scaler"] = scaler
+
+    # Random Forest (primary model)
+    rf_model_path  = Path("models/rf/rf_model.joblib")
+    rf_scaler_path = Path("models/rf/rf_scaler.joblib")
+    if rf_model_path.exists() and rf_scaler_path.exists():
+        _state["rf_model"]  = joblib.load(rf_model_path)
+        _state["rf_scaler"] = joblib.load(rf_scaler_path)
+        print("✅ Random Forest loaded")
+    else:
+        print("⚠️  RF model not found — run: python src/models/train_rf.py")
 
     print("✅ API ready")
 
@@ -221,14 +235,17 @@ class CompoundRequest(BaseModel):
 class PredictionResponse(BaseModel):
     compound_name: str
     smiles: str
-    bioactivity_prediction: float
-    bioactivity_confidence: float
+    rf_bioactivity: float | None = None
+    rf_confidence: float | None = None
+    mlp_bioactivity: float
+    mlp_confidence: float
     toxicity_prediction: float
     toxicity_confidence: float
     lipinski_violations: int
     drug_like: bool
     composite_score: float
     recommendation: str
+    primary_model: str
 
 
 class HealthResponse(BaseModel):
@@ -240,11 +257,12 @@ class HealthResponse(BaseModel):
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
-    return HealthResponse(
+   return HealthResponse(
         status="healthy",
         models_loaded={
-            "bioactivity": _state["bio_model"] is not None,
-            "toxicity":    _state["tox_model"] is not None,
+            "bioactivity":     _state["bio_model"] is not None,
+            "toxicity":        _state["tox_model"] is not None,
+            "random_forest":   _state["rf_model"]  is not None,
         },
     )
 
@@ -267,34 +285,42 @@ async def predict(request: CompoundRequest):
     if not request.smiles:
         raise HTTPException(status_code=400, detail="SMILES string required")
 
-    # Parse SMILES → feature array
     try:
         raw = _smiles_to_features(request.smiles)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
 
-    # Bioactivity
-    if _state["bio_model"] is not None:
-        bio_prob, bio_conf = _run_model(_state["bio_model"], raw, _state["bio_scaler"])
-    else:
-        raise HTTPException(status_code=503, detail="Bioactivity model not loaded. Run training first.")
+    # ── RF prediction (primary) ───────────────────────────────
+    rf_bio, rf_conf = None, None
+    if _state["rf_model"] is not None:
+        x_rf = _state["rf_scaler"].transform(raw)
+        rf_probs = _state["rf_model"].predict_proba(x_rf)[0]
+        rf_bio   = float(rf_probs[1])
+        rf_conf  = float(rf_probs.max())
 
-    # Toxicity
-    if _state["tox_model"] is not None:
-        tox_prob, tox_conf = _run_model(_state["tox_model"], raw, _state["tox_scaler"])
-    else:
-        raise HTTPException(status_code=503, detail="Toxicity model not loaded. Run training first.")
+    # ── MLP prediction (secondary) ────────────────────────────
+    if _state["bio_model"] is None:
+        raise HTTPException(status_code=503, detail="MLP model not loaded")
+    mlp_bio, mlp_conf = _run_model(_state["bio_model"], raw, _state["bio_scaler"])
 
-    # Drug-likeness
+    # ── Toxicity (MLP) ────────────────────────────────────────
+    if _state["tox_model"] is None:
+        raise HTTPException(status_code=503, detail="Toxicity model not loaded")
+    tox_prob, tox_conf = _run_model(_state["tox_model"], raw, _state["tox_scaler"])
+
+    # ── Drug-likeness ─────────────────────────────────────────
     drug_like, violations = _drug_likeness(request.smiles)
 
-    # Composite score (mirrors candidate_ranker logic)
+    # ── Composite score ───────────────────────────────────────
+    # Use RF if available (better CV performance), else fall back to MLP
+    primary_bio   = rf_bio  if rf_bio  is not None else mlp_bio
+    primary_model = "Random Forest" if rf_bio is not None else "MLP"
+
     lip_penalty = min(violations, 4) / 4.0
     composite = max(0.0, min(1.0,
-        0.55 * bio_prob - 0.30 * tox_prob - 0.15 * lip_penalty
+        0.55 * primary_bio - 0.30 * tox_prob - 0.15 * lip_penalty
     ))
 
-    # Recommendation
     if composite >= 0.55:
         rec = "Promising candidate — high bioactivity, acceptable toxicity"
     elif composite >= 0.35:
@@ -305,16 +331,18 @@ async def predict(request: CompoundRequest):
     return PredictionResponse(
         compound_name=request.compound_name or f"compound_{request.smiles[:8]}",
         smiles=request.smiles,
-        bioactivity_prediction=round(bio_prob, 4),
-        bioactivity_confidence=round(bio_conf, 4),
+        rf_bioactivity=round(rf_bio, 4)   if rf_bio   is not None else None,
+        rf_confidence=round(rf_conf, 4)   if rf_conf  is not None else None,
+        mlp_bioactivity=round(mlp_bio, 4),
+        mlp_confidence=round(mlp_conf, 4),
         toxicity_prediction=round(tox_prob, 4),
         toxicity_confidence=round(tox_conf, 4),
         lipinski_violations=violations,
         drug_like=drug_like,
         composite_score=round(composite, 4),
         recommendation=rec,
+        primary_model=primary_model,
     )
-
 
 @app.get("/dataset")
 async def get_dataset_info():
@@ -378,10 +406,10 @@ async def batch_predict(compounds: List[CompoundRequest]):
 
 # ── Serve frontend (replaces Flask) ───────────────────────────────────────
 # This mounts the HTML frontend directly on FastAPI so the Flask proxy
-# in web/backend/app.py is no longer needed.
+# in web/backend/app.py is no longer needed._frontend = Path("web/frontend")
 _frontend = Path("web/frontend")
 if _frontend.exists():
-    app.mount("/", StaticFiles(directory=str(_frontend), html=True), name="frontend")
+    app.mount("/static", StaticFiles(directory=str(_frontend)), name="frontend")
 
 
 if __name__ == "__main__":

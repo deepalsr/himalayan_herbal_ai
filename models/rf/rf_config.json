@@ -1,0 +1,19 @@
+{
+  "model_type": "RandomForestClassifier",
+  "n_estimators": 300,
+  "class_weight": "balanced",
+  "features": [
+    "molecular_weight",
+    "logp",
+    "tpsa",
+    "hbd",
+    "hba",
+    "rotatable_bonds",
+    "aromatic_rings",
+    "lipinski_violations"
+  ],
+  "n_features": 8,
+  "training_date": "2026-06-08T12:55:11.029148",
+  "train_size": 247,
+  "test_size": 62
+}

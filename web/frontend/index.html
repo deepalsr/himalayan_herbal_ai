@@ -940,11 +940,11 @@
                 <div class="bench-row header">
                     <div>Model</div><div>Accuracy</div><div>F1-Score</div><div>ROC-AUC</div>
                 </div>
-                <div class="bench-row">
-                    <div class="bench-model">Random Forest</div>
-                    <div class="metric-val">0.862 <span class="std">±0.018</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:86.2%"></div></div></div>
-                    <div class="metric-val">0.910 <span class="std">±0.011</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:91%"></div></div></div>
-                    <div class="metric-val">0.850 <span class="std">±0.043</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:85%"></div></div></div>
+                <div class="bench-row highlight">
+                    <div class="bench-model ours">Random Forest (ours) ★</div>
+                    <div class="metric-val">0.887 <span class="std">±0.020</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:88.7%"></div></div></div>
+                    <div class="metric-val">0.928 <span class="std">±0.020</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:92.8%"></div></div></div>
+                    <div class="metric-val">0.889 <span class="std">±0.037</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:88.9%"></div></div></div>
                 </div>
                 <div class="bench-row">
                     <div class="bench-model">XGBoost</div>
@@ -952,8 +952,8 @@
                     <div class="metric-val">0.858 <span class="std">±0.014</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:85.8%"></div></div></div>
                     <div class="metric-val">0.827 <span class="std">±0.048</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:82.7%"></div></div></div>
                 </div>
-                <div class="bench-row highlight">
-                    <div class="bench-model ours">MLP (ours) ★</div>
+                <div class="bench-row">
+                    <div class="bench-model">MLP (secondary)</div>
                     <div class="metric-val">0.743 <span class="std">±0.027</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:74.3%"></div></div></div>
                     <div class="metric-val">0.811 <span class="std">±0.021</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:81.1%"></div></div></div>
                     <div class="metric-val">0.843 <span class="std">±0.046</span><div class="metric-bar-outer"><div class="metric-bar-inner" style="width:84.3%"></div></div></div>
@@ -1038,7 +1038,7 @@
 </div>
 
 <script>
-const API = '/api';   // Prefix for Flask backend routes
+const API = 'http://localhost:8000';
 
 const EXAMPLES = {
     curcumin:  { smiles: 'COC1=C(C=CC(=C1)C=CC(=O)CC(=O)C=CC2=CC(=C(C=C2)O)OC)O', name: 'Curcumin',  source: 'Curcuma longa' },
@@ -1131,7 +1131,8 @@ async function predictSingle() {
 }
 
 function displayResult(d) {
-    const bio  = d.bioactivity_prediction;
+    const rf   = d.rf_bioactivity;
+    const mlp  = d.mlp_bioactivity;
     const tox  = d.toxicity_prediction;
     const comp = d.composite_score;
 
@@ -1142,10 +1143,10 @@ function displayResult(d) {
     else if (comp >= 0.35) { tierEl.textContent = 'Moderate';   tierEl.className = 'tier-badge tier-moderate'; }
     else                   { tierEl.textContent = 'Weak';       tierEl.className = 'tier-badge tier-weak'; }
 
-    const bioEl = document.getElementById('resBio');
-    bioEl.textContent = (bio * 100).toFixed(1) + '%';
-    bioEl.className = 'score-val ' + (bio >= 0.6 ? 'good' : bio >= 0.4 ? 'warn' : 'bad');
-    document.getElementById('barBio').style.width = (bio * 100) + '%';
+    const rfEl = document.getElementById('resBio');
+    rfEl.textContent = rf != null ? (rf * 100).toFixed(1) + '%' : '—';
+    rfEl.className = 'score-val ' + (rf >= 0.6 ? 'good' : rf >= 0.4 ? 'warn' : 'bad');
+    document.getElementById('barBio').style.width = (rf != null ? rf * 100 : 0) + '%';
 
     const toxEl = document.getElementById('resTox');
     toxEl.textContent = (tox * 100).toFixed(1) + '%';
@@ -1211,7 +1212,7 @@ function renderBatchResults(preds) {
                    :                '<span class="badge badge-inactive">Weak</span>';
         html += `<div class="batch-result-row">
             <div style="font-family:var(--mono);font-size:11px;color:var(--stone)">${p.compound_name}</div>
-            <div style="font-family:var(--mono)">${(p.bioactivity_prediction*100).toFixed(1)}%</div>
+            <div style="font-family:var(--mono)">${(p.rf_bioactivity*100).toFixed(1)}%</div>
             <div style="font-family:var(--mono)">${(p.toxicity_prediction*100).toFixed(1)}%</div>
             <div style="font-family:var(--mono)">${comp.toFixed(3)}</div>
             <div>${tier}</div>
