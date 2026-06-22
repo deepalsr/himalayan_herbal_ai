@@ -1,28 +1,26 @@
 """
 Himalayan Herbal AI — Gradio Demo App
 ======================================
-Run locally:
-    pip install gradio
-    python app_gradio.py
+HuggingFace Spaces entry point. Loads Random Forest (primary) and
+MLP (secondary) bioactivity models plus an MLP toxicity model.
 
-Deploy to HuggingFace Spaces:
-    1. Create a new Space at huggingface.co/spaces (SDK: Gradio)
-    2. git clone your space repo
-    3. Copy this file + models/ + src/ + requirements_gradio.txt
-    4. git push → auto-deploys with a public URL
+Local run:
+    pip install -r requirements.txt
+    python app.py
 
-The public URL becomes your paper's "live demo" link.
+On HuggingFace Spaces this file MUST be named app.py.
 """
 
 import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
-import json
+import pickle
 import numpy as np
 import torch
 import torch.nn as nn
-import pickle
-from pathlib import Path
+import joblib
+import gradio as gr
+
 
 # ── Model architecture (mirrors train_activity_model.py) ─────────────────
 
@@ -44,10 +42,9 @@ class _Predictor(nn.Module):
 
 # ── Load models ───────────────────────────────────────────────────────────
 
-import joblib
-
 def _load():
     device = 'cpu'
+
     bio_model = _Predictor()
     bio_model.load_state_dict(torch.load("models/bioactivity/best_model.pth", map_location=device))
     bio_model.eval()
@@ -89,7 +86,7 @@ def _features(smiles):
     return np.array([[mw, logp, tpsa, hbd, hba, rot, arom, viol]], dtype=np.float32)
 
 
-def _predict_model(model, scaler, raw):
+def _predict_mlp(model, scaler, raw):
     x = torch.FloatTensor(scaler.transform(raw))
     with torch.no_grad():
         probs = torch.softmax(model(x), dim=1)[0]
@@ -117,8 +114,8 @@ def predict(smiles: str, compound_name: str = ""):
     rf_probs = RF_MODEL.predict_proba(RF_SCALER.transform(raw))[0]
     rf_bio, rf_conf = float(rf_probs[1]), float(rf_probs.max())
 
-    mlp_bio, mlp_conf = _predict_model(BIO_MODEL, BIO_SCALER, raw)
-    tox_prob, tox_conf = _predict_model(TOX_MODEL, TOX_SCALER, raw)
+    mlp_bio, mlp_conf = _predict_mlp(BIO_MODEL, BIO_SCALER, raw)
+    tox_prob, tox_conf = _predict_mlp(TOX_MODEL, TOX_SCALER, raw)
 
     mw   = float(raw[0, 0])
     logp = float(raw[0, 1])
@@ -141,25 +138,25 @@ def predict(smiles: str, compound_name: str = ""):
     name_str = f"### {compound_name}\n\n" if compound_name.strip() else ""
 
     result = f"""{name_str}
-### Prediction Results
+### Prediction results
 
 | Property | Value |
 |---|---|
-| RF Bioactivity (primary) | `{rf_bio:.3f}` ({rf_conf:.0%} confidence) |
-| MLP Bioactivity (secondary) | `{mlp_bio:.3f}` ({mlp_conf:.0%} confidence) |
-| Toxicity Score | `{tox_prob:.3f}` |
-| Composite Score | `{composite:.3f}` |
-| Candidate Tier | {tier} |
+| RF bioactivity (primary) | `{rf_bio:.3f}` ({rf_conf:.0%} confidence) |
+| MLP bioactivity (secondary) | `{mlp_bio:.3f}` ({mlp_conf:.0%} confidence) |
+| Toxicity score | `{tox_prob:.3f}` |
+| Composite score | `{composite:.3f}` |
+| Candidate tier | {tier} |
 | Drug-like (Lipinski) | {'Yes' if drug_like else 'No'} |
-| Lipinski Violations | {viol} / 4 |
+| Lipinski violations | {viol} / 4 |
 
 ### Recommendation
 {rec}
 
-### Molecular Properties
+### Molecular properties
 | Descriptor | Value |
 |---|---|
-| Molecular Weight | {mw:.1f} Da |
+| Molecular weight | {mw:.1f} Da |
 | LogP | {logp:.2f} |
 
 ---
@@ -174,8 +171,6 @@ For research use only — not a clinical recommendation.*
 # ── Gradio UI ─────────────────────────────────────────────────────────────
 
 def build_app():
-    import gradio as gr
-
     with gr.Blocks(
         title="Himalayan Herbal AI",
         theme=gr.themes.Soft(),
@@ -183,30 +178,31 @@ def build_app():
     ) as demo:
 
         gr.Markdown("""
-# 🌿 Himalayan Herbal AI
-### Antimicrobial Bioactivity & Toxicity Predictor
+# Himalayan Herbal AI
+### Antimicrobial bioactivity & toxicity predictor
 
-Predicts the antimicrobial potential and toxicity of molecular compounds
-using a neural network trained on **309 Himalayan medicinal plant compounds**.
+Predicts antimicrobial potential and toxicity of molecular compounds
+using a Random Forest + MLP ensemble trained on **309 Himalayan
+medicinal plant compounds**.
 
-> **Research tool** — predictions are computational estimates, not clinical results.
+> Research tool — predictions are computational estimates, not clinical results.
         """)
 
         with gr.Row():
             with gr.Column(scale=2):
                 smiles_input = gr.Textbox(
-                    label="SMILES String",
+                    label="SMILES string",
                     placeholder="e.g. COC1=C(C=CC(=C1)C=CC(=O)CC(=O)C=CC2=CC(=C(C=C2)O)OC)O",
                     lines=3,
                 )
                 name_input = gr.Textbox(
-                    label="Compound Name (optional)",
+                    label="Compound name (optional)",
                     placeholder="e.g. Curcumin"
                 )
-                predict_btn = gr.Button("🔬 Predict", variant="primary")
+                predict_btn = gr.Button("Predict", variant="primary")
 
             with gr.Column(scale=1):
-                gr.Markdown("### 📌 Example Compounds")
+                gr.Markdown("### Example compounds")
                 for smi, name in EXAMPLE_SMILES:
                     gr.Button(name, size="sm").click(
                         fn=lambda s=smi, n=name: (s, n),
@@ -223,9 +219,8 @@ using a neural network trained on **309 Himalayan medicinal plant compounds**.
 
         gr.Markdown("""
 ---
-**Dataset:** 309 compounds from 12 Himalayan medicinal plants + ChEMBL antibacterial assays  
-**Models:** Descriptor-based MLP | Bioactivity F1=0.89 | ROC-AUC=0.90  
-**Paper:** *[Preprint link — add after submission]*  
+**Dataset:** 309 compounds from 12 Himalayan medicinal plants + ChEMBL antibacterial assays
+**Models:** Random Forest (primary) + descriptor-based MLP (secondary)
 **Code:** [github.com/deepalsr/himalayan-herbal-ai](https://github.com/deepalsr/himalayan-herbal-ai)
         """)
 
@@ -234,4 +229,4 @@ using a neural network trained on **309 Himalayan medicinal plant compounds**.
 
 if __name__ == "__main__":
     app = build_app()
-    app.launch(server_name="0.0.0.0", server_port=7860, share=False)
+    app.launch()
